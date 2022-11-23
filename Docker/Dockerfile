@@ -16,4 +16,6 @@ RUN npm install
 COPY . .
 
 EXPOSE 3000
-CMD [ "node", "server.js" ]
+
+# commenting out for now, not using express.js currently.
+# CMD [ "node", "server.js" ]
