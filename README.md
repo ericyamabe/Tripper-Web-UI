@@ -28,11 +28,7 @@ In your web browser, go to:
 
 http://localhost:3000/
 
-<<<<<<< HEAD
-and you should see the template Dashboard page
-=======
-and you should see "Hello World Node.js"
->>>>>>> 308c624b8500491772a2eafaca11cb46f991ccbd
+and you should see the template dashboard
 
 
 ## Committing to this repo
