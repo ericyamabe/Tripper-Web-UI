@@ -6,9 +6,7 @@ import { Grid, Container, Typography } from '@mui/material';
 // // components
 // import Iconify from '../components/iconify';
 // sections
-import {
-  AppGoogleMapsAPI
-} from '../sections/@dashboard/app';
+import { AppGoogleMapsAPI } from '../sections/@dashboard/app';
 
 // ----------------------------------------------------------------------
 
@@ -27,11 +25,9 @@ export default function DashboardAppPage() {
         </Typography>
 
         <Grid container spacing={3}>
-            <Grid item xs={12} md={12} lg={12}>
-                <AppGoogleMapsAPI
-                    title="Tripper Map"
-                    subheader="Plan your next trip!"/>
-            </Grid>
+          <Grid item xs={12} md={12} lg={12}>
+            <AppGoogleMapsAPI title="Tripper Map" subheader="Plan your next trip!" />
+          </Grid>
         </Grid>
       </Container>
     </>
