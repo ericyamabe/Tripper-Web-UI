@@ -26,9 +26,9 @@ Stop the Container:
 
 In your web browser, go to:
 
-http://localhost/
+http://localhost:3000/
 
-and you should see the Tripper dashboard
+and you should see the template dashboard
 
 
 ## Committing to this repo
