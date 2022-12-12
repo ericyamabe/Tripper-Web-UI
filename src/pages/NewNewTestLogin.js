@@ -1,26 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-// @mui
-import { Link, Stack, IconButton, InputAdornment, TextField, Checkbox } from '@mui/material';
-import { LoadingButton } from '@mui/lab';
-// components
-import Iconify from '../../../components/iconify';
 
-// ----------------------------------------------------------------------
-
-export default function LoginForm() {
+function NewNewTestLogin() {
   const [csrf, setCsrf] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-
-  const navigate = useNavigate();
-
-  const handleClick = (e) => {
-    navigate('/dashboard', { replace: true });
-  };
 
   useEffect(() => {
     getSession();
@@ -38,7 +23,7 @@ export default function LoginForm() {
       .catch((err) => {
         console.log(err);
       });
-  }
+  };
 
   function getSession() {
     fetch('http://localhost:8080/api/session/', {
@@ -57,22 +42,22 @@ export default function LoginForm() {
       .catch((err) => {
         console.log(err);
       });
-  }
+  };
 
   function handlePasswordChange(event) {
     setPassword(event.target.value);
-  }
+  };
 
   function handleUsernameChange(event) {
     setUsername(event.target.value);
-  }
+  };
 
   function isResponseOk(response) {
     if (response.status >= 200 && response.status <= 299) {
       return response.json();
     }
     throw Error(response.statusText);
-  }
+  };
 
   function login(event) {
     event.preventDefault();
@@ -97,11 +82,11 @@ export default function LoginForm() {
         console.log(err);
         setError('Wrong username or password.');
       });
-  }
+  };
 
   function logout() {
-    fetch('http://localhost:8080/api/logout', {
-      credentials: 'include',
+    fetch("http://localhost:8080/api/logout", {
+      credentials: "include",
     })
       .then(isResponseOk)
       .then((data) => {
@@ -112,14 +97,14 @@ export default function LoginForm() {
       .catch((err) => {
         console.log(err);
       });
-  }
+  };
 
   function whoami() {
-    fetch('http://localhost:8080/api/whoami/', {
+    fetch("http://localhost:8080/api/whoami/", {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      credentials: 'include',
+      credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => {
@@ -131,75 +116,33 @@ export default function LoginForm() {
   }
 
   if (!isAuthenticated) {
-    //   return (
-    //     <>
-    //       <form onSubmit={login}>
-    //         <Stack spacing={3}>
-    //           <TextField name="username" label="Username" id="username" defaultValue={username} onChange={handleUsernameChange}/>
-    //
-    //           <TextField
-    //             name="password"
-    //             label="Password"
-    //             id="password"
-    //             defaultValue={password}
-    //             type={showPassword ? 'text' : 'password'}
-    //             InputProps={{
-    //               endAdornment: (
-    //                 <InputAdornment position="end">
-    //                   <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-    //                     <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
-    //                   </IconButton>
-    //                 </InputAdornment>
-    //               ),
-    //             }}
-    //           />
-    //         </Stack>
-    //         <div>{error && <small className="text-danger">{error}</small>}</div>
-    //
-    //
-    //       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
-    //         <Checkbox name="remember" label="Remember me" />
-    //         <Link variant="subtitle2" underline="hover">
-    //           Forgot password?
-    //         </Link>
-    //       </Stack>
-    //
-    //       <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleClick}>
-    //         Login
-    //       </LoadingButton>
-    //       </form>
-    //     </>
-    //   );
-    // }
     return (
       <div className="container mt-3">
+        <h1>React Auth Test</h1>
+        <br />
         <h2>Login</h2>
         <form onSubmit={login}>
           <div className="form-group">
-            <label htmlFor="username">
-              Username&nbsp;
-              <input
-                type="text"
-                className="form-control"
-                id="username"
-                name="username"
-                value={username}
-                onChange={handleUsernameChange}
-              />
-            </label>
+            <label htmlFor="username">Username&nbsp;
+            <input
+              type="text"
+              className="form-control"
+              id="username"
+              name="username"
+              value={username}
+              onChange={handleUsernameChange}
+            /></label>
           </div>
           <div className="form-group">
-            <label htmlFor="username">
-              Password&nbsp;
-              <input
-                type="password"
-                className="form-control"
-                id="password"
-                name="password"
-                value={password}
-                onChange={handlePasswordChange}
-              />
-            </label>
+            <label htmlFor="username">Password&nbsp;
+            <input
+              type="password"
+              className="form-control"
+              id="password"
+              name="password"
+              value={password}
+              onChange={handlePasswordChange}
+            /></label>
             <div>{error && <small className="text-danger">{error}</small>}</div>
           </div>
           <button type="submit" className="btn btn-primary">
@@ -212,13 +155,14 @@ export default function LoginForm() {
 
   return (
     <div className="container mt-3">
+      <h1>React Cookie Auth</h1>
       <p>You are logged in!</p>
-      <button type="button" className="btn btn-primary mr-2" onClick={whoami}>
-        WhoAmI
-      </button>
+      <button type="button" className="btn btn-primary mr-2" onClick={whoami}>WhoAmI</button>
       <button type="button" className="btn btn-danger" onClick={logout}>
         Log out
       </button>
     </div>
   );
-}
+};
+
+export default NewNewTestLogin;

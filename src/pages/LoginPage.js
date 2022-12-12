@@ -9,6 +9,7 @@ import Logo from '../components/logo';
 import Iconify from '../components/iconify';
 // sections
 import { LoginForm } from '../sections/auth/login';
+import NewNewTestLogin from "./NewNewTestLogin";
 
 // ----------------------------------------------------------------------
 
@@ -99,6 +100,7 @@ export default function LoginPage() {
             </Divider>
 
             <LoginForm />
+            {/* <NewNewTestLogin /> */}
           </StyledContent>
         </Container>
       </StyledRoot>
