@@ -7,7 +7,6 @@ import { Grid, Container, Typography } from '@mui/material';
 // import Iconify from '../components/iconify';
 // sections
 import { AppGoogleMapsAPI } from '../sections/@dashboard/app';
-import AppNewGoogleMapsAPI from "../sections/@dashboard/app/AppNewGoogleMapsAPI";
 
 // ----------------------------------------------------------------------
 

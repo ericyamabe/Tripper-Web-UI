@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-// @mui
-import { Link, Stack, IconButton, InputAdornment, TextField, Checkbox } from '@mui/material';
-import { LoadingButton } from '@mui/lab';
-// components
-import Iconify from '../../../components/iconify';
+// import { useNavigate } from 'react-router-dom';
+// // @mui
+// import { Link, Stack, IconButton, InputAdornment, TextField, Checkbox } from '@mui/material';
+// import { LoadingButton } from '@mui/lab';
+// // components
+// import Iconify from '../../../components/iconify';
 
 // ----------------------------------------------------------------------
 
@@ -14,13 +14,13 @@ export default function LoginForm() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  // const [showPassword, setShowPassword] = useState(false);
 
-  const navigate = useNavigate();
-
-  const handleClick = (e) => {
-    navigate('/dashboard', { replace: true });
-  };
+  // const navigate = useNavigate();
+  //
+  // const handleClick = (e) => {
+  //   navigate('/dashboard', { replace: true });
+  // };
 
   useEffect(() => {
     getSession();
