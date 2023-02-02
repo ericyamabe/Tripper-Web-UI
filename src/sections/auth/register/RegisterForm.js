@@ -1,18 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { LoadingButton } from '@mui/lab';
-import {
-  IconButton,
-  InputAdornment,
-  Link,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { IconButton, InputAdornment, Link, Stack, TextField, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Iconify from '../../../components/iconify';
 // ----------------------------------------------------------------------
 
-export default function LoginForm() {
+export default function RegisterForm() {
   const [csrf, setCsrf] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -129,37 +122,12 @@ export default function LoginForm() {
   if (!isAuthenticated) {
     return (
       <>
-        <Typography variant="h4" gutterBottom>
-          Sign in to Tripper
+        <Typography variant="h4" sx={{ mb: 5 }} gutterBottom>
+          Sign up for Tripper
         </Typography>
-
-        <Typography variant="body2" sx={{ mb: 5 }}>
-          Don’t have an account? {''}
-          <Link component="button" variant="subtitle2" onClick={handleClick}>Get started</Link>
-        </Typography>
-
-        {/* <Stack direction="row" spacing={2}> */}
-        {/*   <Button fullWidth size="large" color="inherit" variant="outlined"> */}
-        {/*     <Iconify icon="eva:google-fill" color="#DF3E30" width={22} height={22} /> */}
-        {/*   </Button> */}
-
-        {/*   <Button fullWidth size="large" color="inherit" variant="outlined"> */}
-        {/*     <Iconify icon="eva:facebook-fill" color="#1877F2" width={22} height={22} /> */}
-        {/*   </Button> */}
-
-        {/*   <Button fullWidth size="large" color="inherit" variant="outlined"> */}
-        {/*     <Iconify icon="eva:twitter-fill" color="#1C9CEA" width={22} height={22} /> */}
-        {/*   </Button> */}
-        {/* </Stack> */}
-
-        {/* <Divider sx={{ my: 3 }}> */}
-        {/*   <Typography variant="body2" sx={{ color: 'text.secondary' }}> */}
-        {/*     OR */}
-        {/*   </Typography> */}
-        {/* </Divider> */}
 
         <form onSubmit={login}>
-          <Stack spacing={3}>
+          <Stack spacing={3} justifyContent="space-between" sx={{ mb: 2 }}>
             <TextField
               name="username"
               label="Username"
@@ -185,19 +153,38 @@ export default function LoginForm() {
                 ),
               }}
             />
+
+            <TextField
+              name="confirmpassword"
+              label="Confirm Password"
+              id="confirmpassword"
+              defaultValue={password}
+              onChange={(e) => setPassword(e.target.value)}
+              type={showPassword ? 'text' : 'password'}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                      <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+              <TextField
+                  name="email"
+                  label="Email"
+                  id="email"
+                  defaultValue={username}
+                  onChange={(e) => setUsername(e.target.value)}
+              />
           </Stack>
           <div>{error && <small className="text-danger">{error}</small>}</div>
 
-          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
-            {/* <Checkbox name="remember" label="Remember me" /> */}
-            <Link variant="subtitle2" underline="hover">
-              Forgot password?
-            </Link>
-          </Stack>
-
           {/* <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleClick}> */}
           <LoadingButton fullWidth size="large" type="submit" variant="contained">
-            Login
+            Register
           </LoadingButton>
         </form>
       </>
