@@ -7,6 +7,7 @@ import BlogPage from './pages/BlogPage';
 import UserPage from './pages/UserPage';
 import LoginPage from './pages/LoginPage';
 import Page404 from './pages/Page404';
+import Landing from './pages/Landing';
 import ProductsPage from './pages/ProductsPage';
 import DashboardAppPage from './pages/DashboardAppPage';
 
@@ -28,6 +29,10 @@ export default function Router() {
     {
       path: 'login',
       element: <LoginPage />,
+    },
+    {
+      path: 'landing',
+      element: <Landing />,
     },
     {
       element: <SimpleLayout />,
