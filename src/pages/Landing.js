@@ -44,7 +44,8 @@ export default function Landing() {
           />
 
           <Stack direction="row" spacing={2}>
-            <Button to="/" size="large" variant="contained" sx={{ px: 3 }} component={RouterLink}>
+            {/* Change this back to "/" when landing page is deprecated */}
+            <Button to="/dashboard" size="large" variant="contained" sx={{ px: 3 }} component={RouterLink}>
               Go to Home
             </Button>
 
