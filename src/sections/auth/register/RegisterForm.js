@@ -8,10 +8,13 @@ import Iconify from '../../../components/iconify';
 export default function RegisterForm() {
   const [csrf, setCsrf] = useState('');
   const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [password1, setPassword1] = useState('');
+  const [password2, setPassword2] = useState('');
+  const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword1, setShowPassword1] = useState(false);
+  const [showPassword2, setShowPassword2] = useState(false);
 
   const navigate = useNavigate();
 
@@ -63,28 +66,31 @@ export default function RegisterForm() {
     throw Error(response.statusText);
   }
 
-  function login(event) {
+  function register(event) {
     event.preventDefault();
-    fetch('http://localhost:8080/api/login/', {
+    fetch('http://localhost:8080/api/register/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRFToken': csrf,
       },
       credentials: 'include',
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ username, email, password1, password2 }),
     })
       .then(isResponseOk)
       .then((data) => {
         console.log(data);
-        setIsAuthenticated(true);
-        setUsername('');
-        setPassword('');
-        setError('');
+        console.log(JSON.stringify({ username, email, password1, password2 }));
+        // setIsAuthenticated(true);
+        // setUsername('');
+        // setEmail('');
+        // setPassword1('');
+        // setPassword2('');
+        // setError('');
       })
       .catch((err) => {
         console.log(err);
-        setError('Wrong username or password.');
+        setError('Something went wrong.');
       });
   }
 
@@ -126,7 +132,7 @@ export default function RegisterForm() {
           Sign up for Tripper
         </Typography>
 
-        <form onSubmit={login}>
+        <form onSubmit={register}>
           <Stack spacing={3} justifyContent="space-between" sx={{ mb: 2 }}>
             <TextField
               name="username"
@@ -137,17 +143,25 @@ export default function RegisterForm() {
             />
 
             <TextField
-              name="password"
+              name="email"
+              label="Email"
+              id="email"
+              defaultValue={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+
+            <TextField
+              name="password1"
               label="Password"
-              id="password"
-              defaultValue={password}
-              onChange={(e) => setPassword(e.target.value)}
-              type={showPassword ? 'text' : 'password'}
+              id="password1"
+              defaultValue={password1}
+              onChange={(e) => setPassword1(e.target.value)}
+              type={showPassword1 ? 'text' : 'password'}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                      <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                    <IconButton onClick={() => setShowPassword1(!showPassword1)} edge="end">
+                      <Iconify icon={showPassword1 ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -155,30 +169,22 @@ export default function RegisterForm() {
             />
 
             <TextField
-              name="confirmpassword"
+              name="password2"
               label="Confirm Password"
-              id="confirmpassword"
-              defaultValue={password}
-              onChange={(e) => setPassword(e.target.value)}
-              type={showPassword ? 'text' : 'password'}
+              id="password2"
+              defaultValue={password2}
+              onChange={(e) => setPassword2(e.target.value)}
+              type={showPassword2 ? 'text' : 'password'}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                      <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                    <IconButton onClick={() => setShowPassword2(!showPassword2)} edge="end">
+                      <Iconify icon={showPassword2 ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
                     </IconButton>
                   </InputAdornment>
                 ),
               }}
             />
-
-              <TextField
-                  name="email"
-                  label="Email"
-                  id="email"
-                  defaultValue={username}
-                  onChange={(e) => setUsername(e.target.value)}
-              />
           </Stack>
           <div>{error && <small className="text-danger">{error}</small>}</div>
 

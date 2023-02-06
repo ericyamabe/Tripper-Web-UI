@@ -1,13 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LoadingButton } from '@mui/lab';
-import {
-  IconButton,
-  InputAdornment,
-  Link,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { IconButton, InputAdornment, Link, Stack, TextField, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Iconify from '../../../components/iconify';
 // ----------------------------------------------------------------------
@@ -24,6 +17,10 @@ export default function LoginForm() {
 
   const handleClick = (e) => {
     navigate('/register', { replace: true });
+  };
+
+  const handleClickLogin = (e) => {
+    navigate('/', { replace: true });
   };
 
   useEffect(() => {
@@ -135,7 +132,9 @@ export default function LoginForm() {
 
         <Typography variant="body2" sx={{ mb: 5 }}>
           Don’t have an account? {''}
-          <Link component="button" variant="subtitle2" onClick={handleClick}>Get started</Link>
+          <Link component="button" variant="subtitle2" onClick={handleClick}>
+            Get started
+          </Link>
         </Typography>
 
         {/* <Stack direction="row" spacing={2}> */}
@@ -196,6 +195,7 @@ export default function LoginForm() {
           </Stack>
 
           {/* <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleClick}> */}
+          {/* <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleClickLogin}> */}
           <LoadingButton fullWidth size="large" type="submit" variant="contained">
             Login
           </LoadingButton>
