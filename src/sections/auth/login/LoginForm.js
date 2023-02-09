@@ -28,7 +28,7 @@ export default function LoginForm() {
   }, []);
 
   function getCSRF() {
-    fetch('http://localhost:8080/api/csrf/', {
+    fetch('http://localhost:8080/api/v1/csrf/', {
       credentials: 'include',
     })
       .then((res) => {
@@ -42,7 +42,7 @@ export default function LoginForm() {
   }
 
   function getSession() {
-    fetch('http://localhost:8080/api/session/', {
+    fetch('http://localhost:8080/api/v1/session/', {
       credentials: 'include',
     })
       .then((res) => res.json())
@@ -69,7 +69,7 @@ export default function LoginForm() {
 
   function login(event) {
     event.preventDefault();
-    fetch('http://localhost:8080/api/login/', {
+    fetch('http://localhost:8080/api/v1/login/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ export default function LoginForm() {
   }
 
   function logout() {
-    fetch('http://localhost:8080/api/logout', {
+    fetch('http://localhost:8080/api/v1/logout', {
       credentials: 'include',
     })
       .then(isResponseOk)
@@ -108,7 +108,7 @@ export default function LoginForm() {
   }
 
   function whoami() {
-    fetch('http://localhost:8080/api/whoami/', {
+    fetch('http://localhost:8080/api/v1/whoami/', {
       headers: {
         'Content-Type': 'application/json',
       },
