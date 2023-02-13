@@ -3,11 +3,12 @@ import { LoadingButton } from '@mui/lab';
 import { IconButton, InputAdornment, Link, Stack, TextField, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Iconify from '../../../components/iconify';
+
 // ----------------------------------------------------------------------
 
 export default function LoginForm() {
   const [csrf, setCsrf] = useState('');
-  const [username, setUsername] = useState('');
+  const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -67,22 +68,22 @@ export default function LoginForm() {
     throw Error(response.statusText);
   }
 
-  function login(event) {
+  function userLogin(event) {
     event.preventDefault();
-    fetch('http://localhost:8080/api/v1/login/', {
+    fetch('http://localhost:8080/api/v1/accounts/login/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRFToken': csrf,
       },
       credentials: 'include',
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ login, password }),
     })
       .then(isResponseOk)
       .then((data) => {
         console.log(data);
         setIsAuthenticated(true);
-        setUsername('');
+        setLogin('');
         setPassword('');
         setError('');
       })
@@ -157,14 +158,14 @@ export default function LoginForm() {
         {/*   </Typography> */}
         {/* </Divider> */}
 
-        <form onSubmit={login}>
+        <form onSubmit={userLogin}>
           <Stack spacing={3}>
             <TextField
-              name="username"
+              name="login"
               label="Username"
-              id="username"
-              defaultValue={username}
-              onChange={(e) => setUsername(e.target.value)}
+              id="login"
+              defaultValue={login}
+              onChange={(e) => setLogin(e.target.value)}
             />
 
             <TextField

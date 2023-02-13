@@ -3,24 +3,22 @@ import { LoadingButton } from '@mui/lab';
 import { IconButton, InputAdornment, Link, Stack, TextField, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Iconify from '../../../components/iconify';
+import { register } from '../../../serviceWorker';
 // ----------------------------------------------------------------------
+/* eslint-disable camelcase */
 
 export default function RegisterForm() {
   const [csrf, setCsrf] = useState('');
   const [username, setUsername] = useState('');
-  const [password1, setPassword1] = useState('');
-  const [password2, setPassword2] = useState('');
+  const [password, setPassword] = useState('');
+  const [password_confirm, setPassword_Confirm] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [showPassword1, setShowPassword1] = useState(false);
-  const [showPassword2, setShowPassword2] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword_Confirm, setShowPassword_Confirm] = useState(false);
 
   const navigate = useNavigate();
-
-  const handleClick = (e) => {
-    navigate('/register', { replace: true });
-  };
 
   useEffect(() => {
     getSession();
@@ -75,37 +73,27 @@ export default function RegisterForm() {
         'X-CSRFToken': csrf,
       },
       credentials: 'include',
-      body: JSON.stringify({ username, email, password1, password2 }),
+      body: JSON.stringify({ username, email, password, password_confirm }),
     })
       .then(isResponseOk)
       .then((data) => {
         console.log(data);
-        console.log(JSON.stringify({ username, email, password1, password2 }));
-        // setIsAuthenticated(true);
-        // setUsername('');
-        // setEmail('');
-        // setPassword1('');
-        // setPassword2('');
-        // setError('');
+        setIsAuthenticated(true);
+        setUsername('');
+        setEmail('');
+        setPassword('');
+        setPassword_Confirm('');
+        setError('');
+        // navigate('/dashboard/app', { replace: true });
       })
       .catch((err) => {
         console.log(err);
-        setError('Something went wrong.');
-      });
-  }
-
-  function logout() {
-    fetch('http://localhost:8080/api/v1/logout', {
-      credentials: 'include',
-    })
-      .then(isResponseOk)
-      .then((data) => {
-        console.log(data);
-        setIsAuthenticated(false);
-        getCSRF();
-      })
-      .catch((err) => {
-        console.log(err);
+        setError(err.error);
+        if (password !== password_confirm) setError('Make sure passwords match.');
+        if (password_confirm === '') setError('Enter a valid password.');
+        if (password === '') setError('Enter a valid password.');
+        if (email === '') setError('Enter a valid email.');
+        if (username === '') setError('Enter a valid username.');
       });
   }
 
@@ -151,17 +139,17 @@ export default function RegisterForm() {
             />
 
             <TextField
-              name="password1"
+              name="password"
               label="Password"
-              id="password1"
-              defaultValue={password1}
-              onChange={(e) => setPassword1(e.target.value)}
-              type={showPassword1 ? 'text' : 'password'}
+              id="password"
+              defaultValue={password}
+              onChange={(e) => setPassword(e.target.value)}
+              type={showPassword ? 'text' : 'password'}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton onClick={() => setShowPassword1(!showPassword1)} edge="end">
-                      <Iconify icon={showPassword1 ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                      <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -172,14 +160,14 @@ export default function RegisterForm() {
               name="password2"
               label="Confirm Password"
               id="password2"
-              defaultValue={password2}
-              onChange={(e) => setPassword2(e.target.value)}
-              type={showPassword2 ? 'text' : 'password'}
+              defaultValue={password_confirm}
+              onChange={(e) => setPassword_Confirm(e.target.value)}
+              type={showPassword_Confirm ? 'text' : 'password'}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton onClick={() => setShowPassword2(!showPassword2)} edge="end">
-                      <Iconify icon={showPassword2 ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                    <IconButton onClick={() => setShowPassword_Confirm(!showPassword_Confirm)} edge="end">
+                      <Iconify icon={showPassword_Confirm ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -187,8 +175,6 @@ export default function RegisterForm() {
             />
           </Stack>
           <div>{error && <small className="text-danger">{error}</small>}</div>
-
-          {/* <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleClick}> */}
           <LoadingButton fullWidth size="large" type="submit" variant="contained">
             Register
           </LoadingButton>
@@ -196,16 +182,4 @@ export default function RegisterForm() {
       </>
     );
   }
-
-  return (
-    <div className="container mt-3">
-      <p>You are logged in!</p>
-      <button type="button" className="btn btn-primary mr-2" onClick={whoami}>
-        WhoAmI
-      </button>
-      <button type="button" className="btn btn-danger" onClick={logout}>
-        Log out
-      </button>
-    </div>
-  );
 }
