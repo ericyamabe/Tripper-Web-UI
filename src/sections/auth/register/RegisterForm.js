@@ -3,26 +3,22 @@ import { LoadingButton } from '@mui/lab';
 import { IconButton, InputAdornment, Link, Stack, TextField, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Iconify from '../../../components/iconify';
-
+import { register } from '../../../serviceWorker';
 // ----------------------------------------------------------------------
+/* eslint-disable camelcase */
 
-export default function LoginForm() {
+export default function RegisterForm() {
   const [csrf, setCsrf] = useState('');
-  const [login, setLogin] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [password_confirm, setPassword_Confirm] = useState('');
+  const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showPassword_Confirm, setShowPassword_Confirm] = useState(false);
 
   const navigate = useNavigate();
-
-  const handleClick = (e) => {
-    navigate('/register', { replace: true });
-  };
-
-  const handleClickLogin = (e) => {
-    navigate('/', { replace: true });
-  };
 
   useEffect(() => {
     getSession();
@@ -68,43 +64,36 @@ export default function LoginForm() {
     throw Error(response.statusText);
   }
 
-  function userLogin(event) {
+  function register(event) {
     event.preventDefault();
-    fetch('http://localhost:8080/api/v1/accounts/login/', {
+    fetch('http://localhost:8080/api/v1/accounts/register/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRFToken': csrf,
       },
       credentials: 'include',
-      body: JSON.stringify({ login, password }),
+      body: JSON.stringify({ username, email, password, password_confirm }),
     })
       .then(isResponseOk)
       .then((data) => {
         console.log(data);
         setIsAuthenticated(true);
-        setLogin('');
+        setUsername('');
+        setEmail('');
         setPassword('');
+        setPassword_Confirm('');
         setError('');
+        // navigate('/dashboard/app', { replace: true });
       })
       .catch((err) => {
         console.log(err);
-        setError('Wrong username or password.');
-      });
-  }
-
-  function logout() {
-    fetch('http://localhost:8080/api/v1/logout', {
-      credentials: 'include',
-    })
-      .then(isResponseOk)
-      .then((data) => {
-        console.log(data);
-        setIsAuthenticated(false);
-        getCSRF();
-      })
-      .catch((err) => {
-        console.log(err);
+        setError(err.error);
+        if (password !== password_confirm) setError('Make sure passwords match.');
+        if (password_confirm === '') setError('Enter a valid password.');
+        if (password === '') setError('Enter a valid password.');
+        if (email === '') setError('Enter a valid email.');
+        if (username === '') setError('Enter a valid username.');
       });
   }
 
@@ -127,45 +116,26 @@ export default function LoginForm() {
   if (!isAuthenticated) {
     return (
       <>
-        <Typography variant="h4" gutterBottom>
-          Sign in to Tripper
+        <Typography variant="h4" sx={{ mb: 5 }} gutterBottom>
+          Sign up for Tripper
         </Typography>
 
-        <Typography variant="body2" sx={{ mb: 5 }}>
-          Don’t have an account? {''}
-          <Link component="button" variant="subtitle2" onClick={handleClick}>
-            Get started
-          </Link>
-        </Typography>
-
-        {/* <Stack direction="row" spacing={2}> */}
-        {/*   <Button fullWidth size="large" color="inherit" variant="outlined"> */}
-        {/*     <Iconify icon="eva:google-fill" color="#DF3E30" width={22} height={22} /> */}
-        {/*   </Button> */}
-
-        {/*   <Button fullWidth size="large" color="inherit" variant="outlined"> */}
-        {/*     <Iconify icon="eva:facebook-fill" color="#1877F2" width={22} height={22} /> */}
-        {/*   </Button> */}
-
-        {/*   <Button fullWidth size="large" color="inherit" variant="outlined"> */}
-        {/*     <Iconify icon="eva:twitter-fill" color="#1C9CEA" width={22} height={22} /> */}
-        {/*   </Button> */}
-        {/* </Stack> */}
-
-        {/* <Divider sx={{ my: 3 }}> */}
-        {/*   <Typography variant="body2" sx={{ color: 'text.secondary' }}> */}
-        {/*     OR */}
-        {/*   </Typography> */}
-        {/* </Divider> */}
-
-        <form onSubmit={userLogin}>
-          <Stack spacing={3}>
+        <form onSubmit={register}>
+          <Stack spacing={3} justifyContent="space-between" sx={{ mb: 2 }}>
             <TextField
-              name="login"
+              name="username"
               label="Username"
-              id="login"
-              defaultValue={login}
-              onChange={(e) => setLogin(e.target.value)}
+              id="username"
+              defaultValue={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+
+            <TextField
+              name="email"
+              label="Email"
+              id="email"
+              defaultValue={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
 
             <TextField
@@ -185,35 +155,31 @@ export default function LoginForm() {
                 ),
               }}
             />
+
+            <TextField
+              name="password2"
+              label="Confirm Password"
+              id="password2"
+              defaultValue={password_confirm}
+              onChange={(e) => setPassword_Confirm(e.target.value)}
+              type={showPassword_Confirm ? 'text' : 'password'}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword_Confirm(!showPassword_Confirm)} edge="end">
+                      <Iconify icon={showPassword_Confirm ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
           </Stack>
           <div>{error && <small className="text-danger">{error}</small>}</div>
-
-          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
-            {/* <Checkbox name="remember" label="Remember me" /> */}
-            <Link variant="subtitle2" underline="hover">
-              Forgot password?
-            </Link>
-          </Stack>
-
-          {/* <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleClick}> */}
-          {/* <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleClickLogin}> */}
           <LoadingButton fullWidth size="large" type="submit" variant="contained">
-            Login
+            Register
           </LoadingButton>
         </form>
       </>
     );
   }
-
-  return (
-    <div className="container mt-3">
-      <p>You are logged in!</p>
-      <button type="button" className="btn btn-primary mr-2" onClick={whoami}>
-        WhoAmI
-      </button>
-      <button type="button" className="btn btn-danger" onClick={logout}>
-        Log out
-      </button>
-    </div>
-  );
 }
