@@ -12,6 +12,7 @@ import VerifyEmailPage from './pages/VerifyEmailPage';
 import Landing from './pages/Landing';
 import ProductsPage from './pages/ProductsPage';
 import DashboardAppPage from './pages/DashboardAppPage';
+import RegisterPage from "./pages/RegisterPage";
 
 // ----------------------------------------------------------------------
 
@@ -39,7 +40,11 @@ export default function Router() {
     {
       path: 'VerifyEmailPage',
       element: <VerifyEmailPage />,
+      
     },
+    {      
+      path: 'register',
+      element: <RegisterPage />,},
     {
       element: <SimpleLayout />,
       children: [
