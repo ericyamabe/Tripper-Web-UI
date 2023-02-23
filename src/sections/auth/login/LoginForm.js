@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Iconify from '../../../components/iconify';
 
 // ----------------------------------------------------------------------
+/* eslint-disable camelcase */
 
 export default function LoginForm() {
   const [csrf, setCsrf] = useState('');
@@ -26,6 +27,7 @@ export default function LoginForm() {
 
   useEffect(() => {
     getSession();
+    console.log(csrf);
   }, []);
 
   function getCSRF() {
@@ -86,6 +88,7 @@ export default function LoginForm() {
         setLogin('');
         setPassword('');
         setError('');
+        getCSRF();
       })
       .catch((err) => {
         console.log(err);
@@ -93,9 +96,15 @@ export default function LoginForm() {
       });
   }
 
-  function logout() {
-    fetch('http://localhost:8080/api/v1/logout', {
+  function userLogout() {
+    fetch('http://localhost:8080/api/v1/accounts/logout/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrf,
+      },
       credentials: 'include',
+      body: JSON.stringify({revoke_token: true})
     })
       .then(isResponseOk)
       .then((data) => {
@@ -118,6 +127,9 @@ export default function LoginForm() {
       .then((res) => res.json())
       .then((data) => {
         console.log(`You are logged in as: ${data.username}`);
+        console.log(`Your user ID is: ${data.id}`);
+        console.log(`Your email is: ${data.email}`);
+        console.log(`Your CSRF Token is: ${csrf}`)
       })
       .catch((err) => {
         console.log(err);
@@ -137,26 +149,6 @@ export default function LoginForm() {
             Get started
           </Link>
         </Typography>
-
-        {/* <Stack direction="row" spacing={2}> */}
-        {/*   <Button fullWidth size="large" color="inherit" variant="outlined"> */}
-        {/*     <Iconify icon="eva:google-fill" color="#DF3E30" width={22} height={22} /> */}
-        {/*   </Button> */}
-
-        {/*   <Button fullWidth size="large" color="inherit" variant="outlined"> */}
-        {/*     <Iconify icon="eva:facebook-fill" color="#1877F2" width={22} height={22} /> */}
-        {/*   </Button> */}
-
-        {/*   <Button fullWidth size="large" color="inherit" variant="outlined"> */}
-        {/*     <Iconify icon="eva:twitter-fill" color="#1C9CEA" width={22} height={22} /> */}
-        {/*   </Button> */}
-        {/* </Stack> */}
-
-        {/* <Divider sx={{ my: 3 }}> */}
-        {/*   <Typography variant="body2" sx={{ color: 'text.secondary' }}> */}
-        {/*     OR */}
-        {/*   </Typography> */}
-        {/* </Divider> */}
 
         <form onSubmit={userLogin}>
           <Stack spacing={3}>
@@ -211,7 +203,7 @@ export default function LoginForm() {
       <button type="button" className="btn btn-primary mr-2" onClick={whoami}>
         WhoAmI
       </button>
-      <button type="button" className="btn btn-danger" onClick={logout}>
+      <button type="button" className="btn btn-danger" onClick={userLogout}>
         Log out
       </button>
     </div>

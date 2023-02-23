@@ -84,6 +84,7 @@ export default function RegisterForm() {
         setPassword('');
         setPassword_Confirm('');
         setError('');
+        getCSRF();
         // navigate('/dashboard/app', { replace: true });
       })
       .catch((err) => {
