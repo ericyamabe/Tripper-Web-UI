@@ -79,7 +79,8 @@ const Logo = forwardRef(({ disabledLink = false, sx, ...other }, ref) => {
   }
 
   return (
-    <Link to="/" component={RouterLink} sx={{ display: 'contents' }}>
+      // Change this back to "/" when landing page is deprecated
+    <Link to="/dashboard" component={RouterLink} sx={{ display: 'contents' }}>
       {logo}
     </Link>
   );
