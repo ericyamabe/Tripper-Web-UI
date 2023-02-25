@@ -3,7 +3,6 @@ import { LoadingButton } from '@mui/lab';
 import { IconButton, InputAdornment, Link, Stack, TextField, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Iconify from '../../../components/iconify';
-import { register } from '../../../serviceWorker';
 // ----------------------------------------------------------------------
 /* eslint-disable camelcase */
 
@@ -95,22 +94,6 @@ export default function RegisterForm() {
         if (password === '') setError('Enter a valid password.');
         if (email === '') setError('Enter a valid email.');
         if (username === '') setError('Enter a valid username.');
-      });
-  }
-
-  function whoami() {
-    fetch('http://localhost:8080/api/v1/whoami/', {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(`You are logged in as: ${data.username}`);
-      })
-      .catch((err) => {
-        console.log(err);
       });
   }
 

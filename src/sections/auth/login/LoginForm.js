@@ -3,6 +3,7 @@ import { LoadingButton } from '@mui/lab';
 import { IconButton, InputAdornment, Link, Stack, TextField, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Iconify from '../../../components/iconify';
+import WhoAmI from '../WhoAmI';
 
 // ----------------------------------------------------------------------
 /* eslint-disable camelcase */
@@ -27,7 +28,7 @@ export default function LoginForm() {
 
   useEffect(() => {
     getSession();
-    console.log(csrf);
+    // console.log(csrf);
   }, []);
 
   function getCSRF() {
@@ -117,25 +118,6 @@ export default function LoginForm() {
       });
   }
 
-  function whoami() {
-    fetch('http://localhost:8080/api/v1/whoami/', {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(`You are logged in as: ${data.username}`);
-        console.log(`Your user ID is: ${data.id}`);
-        console.log(`Your email is: ${data.email}`);
-        console.log(`Your CSRF Token is: ${csrf}`)
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-
   if (!isAuthenticated) {
     return (
       <>
@@ -200,7 +182,7 @@ export default function LoginForm() {
   return (
     <div className="container mt-3">
       <p>You are logged in!</p>
-      <button type="button" className="btn btn-primary mr-2" onClick={whoami}>
+      <button type="button" className="btn btn-primary mr-2" onClick={WhoAmI}>
         WhoAmI
       </button>
       <button type="button" className="btn btn-danger" onClick={userLogout}>
