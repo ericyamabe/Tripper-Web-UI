@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 // @mui
 import { styled } from '@mui/material/styles';
@@ -34,6 +34,45 @@ const Main = styled('div')(({ theme }) => ({
 
 export default function DashboardLayout() {
   const [open, setOpen] = useState(false);
+  // const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // const [csrf, setCsrf] = useState('');
+  //
+  // useEffect(() => {
+  //   getSession();
+  // }, []);
+  //
+  // function getCSRF() {
+  //   fetch('http://localhost:8080/api/v1/csrf/', {
+  //     credentials: 'include',
+  //   })
+  //       .then((res) => {
+  //         const csrfToken = res.headers.get('X-CSRFToken');
+  //         setCsrf(csrfToken);
+  //         console.log(csrfToken);
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //       });
+  // }
+  //
+  // function getSession() {
+  //   fetch('http://localhost:8080/api/v1/session/', {
+  //     credentials: 'include',
+  //   })
+  //       .then((res) => res.json())
+  //       .then((data) => {
+  //         console.log(data);
+  //         if (data.isAuthenticated) {
+  //           setIsAuthenticated(true);
+  //         } else {
+  //           setIsAuthenticated(false);
+  //           GetCSRF();
+  //         }
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //       });
+  // }
 
   return (
     <StyledRoot>

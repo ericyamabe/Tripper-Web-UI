@@ -35,6 +35,28 @@ export default function AccountPopover() {
     setOpen(null);
   };
 
+  const handleLogout = async (e) => {
+    await fetch('http://localhost:8080/api/v1/accounts/logout/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // 'X-CSRFToken': csrf,
+      },
+      credentials: 'include',
+      body: JSON.stringify({ revoke_token: true }),
+    })
+      // .then(isResponseOk)
+      .then((data) => {
+        console.log(data);
+        // setIsAuthenticated(false);
+        // setSuccess(false);
+        Headers.get('csrftoken');
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   return (
     <>
       <IconButton
@@ -97,7 +119,7 @@ export default function AccountPopover() {
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        <MenuItem onClick={handleClose} sx={{ m: 1 }}>
+        <MenuItem onClick={handleLogout} sx={{ m: 1 }}>
           Logout
         </MenuItem>
       </Popover>
