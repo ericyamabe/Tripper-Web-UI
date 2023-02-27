@@ -18,10 +18,11 @@ export default function LoginForm() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const navigate = useNavigate();
 
-  const { setAuth } = useAuth();
+  // const { isAuthenticated, setIsAuthenticated } = useAuth();
   const LOGIN_URL = '/api/v1/accounts/login/';
   const LOGOUT_URL = '/api/v1/accounts/logout/';
 
@@ -30,7 +31,7 @@ export default function LoginForm() {
   };
 
   const handleClickLogin = (e) => {
-    navigate('/', { replace: true });
+    navigate('/dashboard', { replace: true });
   };
 
   useEffect(() => {
@@ -60,7 +61,9 @@ export default function LoginForm() {
         console.log(data);
         if (data.isAuthenticated) {
           setIsAuthenticated(true);
+          setIsLoaded(true);
         } else {
+          setIsLoaded(true);
           setIsAuthenticated(false);
           getCSRF();
         }
@@ -82,7 +85,7 @@ export default function LoginForm() {
 
     try {
       const response = await axios.post(LOGIN_URL, JSON.stringify({ login, password }), {
-        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': 'csrf' },
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrf },
         withCredentials: true,
       });
       console.log(JSON.stringify(response?.data));
@@ -92,7 +95,9 @@ export default function LoginForm() {
       setLogin('');
       setPassword('');
       setError('');
+      // setIsAuthenticated(true);
       setSuccess(true);
+      setIsLoaded(true);
     } catch (err) {
       if (!err?.response) {
         setError('No Server Response');
@@ -145,13 +150,32 @@ export default function LoginForm() {
         console.log(data);
         setIsAuthenticated(false);
         setSuccess(false);
-        Headers.get('csrftoken')
+        Headers.get('csrftoken');
       })
       .catch((err) => {
         console.log(err);
       });
   };
 
+  if (!isLoaded) {
+    return <div>Loading...</div>;
+  }
+  if (isAuthenticated) {
+    return (
+      <div className="container mt-3">
+        <p>You are logged in!</p>
+        <button type="button" className="btn btn-primary mr-2" onClick={WhoAmI}>
+          WhoAmI
+        </button>
+        <button type="button" className="btn btn-danger" onClick={handleClickLogin}>
+          Home
+        </button>
+        <button type="button" className="btn btn-danger" onClick={handleLogout}>
+          Log out
+        </button>
+      </div>
+    );
+  }
   return (
     <>
       {success ? (
@@ -162,7 +186,8 @@ export default function LoginForm() {
           </button>
           <button type="button" className="btn btn-danger" onClick={handleClickLogin}>
             Home
-          </button><button type="button" className="btn btn-danger" onClick={handleLogout}>
+          </button>
+          <button type="button" className="btn btn-danger" onClick={handleLogout}>
             Log out
           </button>
         </div>

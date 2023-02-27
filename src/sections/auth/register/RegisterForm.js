@@ -3,6 +3,7 @@ import { LoadingButton } from '@mui/lab';
 import { IconButton, InputAdornment, Link, Stack, TextField, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Iconify from '../../../components/iconify';
+import useAuth from '../../../hooks/useAuth';
 // ----------------------------------------------------------------------
 /* eslint-disable camelcase */
 
@@ -18,6 +19,12 @@ export default function RegisterForm() {
   const [showPassword_Confirm, setShowPassword_Confirm] = useState(false);
 
   const navigate = useNavigate();
+
+  // const { isAuthenticated, setIsAuthenticated } = useAuth();
+
+  const handleClick = (e) => {
+    navigate('/login', { replace: true });
+  };
 
   useEffect(() => {
     getSession();
@@ -63,7 +70,7 @@ export default function RegisterForm() {
     throw Error(response.statusText);
   }
 
-  function register(event) {
+  function handleRegister(event) {
     event.preventDefault();
     fetch('http://localhost:8080/api/v1/accounts/register/', {
       method: 'POST',
@@ -84,7 +91,7 @@ export default function RegisterForm() {
         setPassword_Confirm('');
         setError('');
         getCSRF();
-        // navigate('/dashboard/app', { replace: true });
+        navigate('/login', { replace: true });
       })
       .catch((err) => {
         console.log(err);
@@ -100,11 +107,18 @@ export default function RegisterForm() {
   if (!isAuthenticated) {
     return (
       <>
-        <Typography variant="h4" sx={{ mb: 5 }} gutterBottom>
+        <Typography variant="h4" gutterBottom>
           Sign up for Tripper
         </Typography>
 
-        <form onSubmit={register}>
+        <Typography variant="body2" sx={{ mb: 5 }}>
+          Have an account? {''}
+          <Link component="button" variant="subtitle2" onClick={handleClick}>
+            Sign in
+          </Link>
+        </Typography>
+
+        <form onSubmit={handleRegister}>
           <Stack spacing={3} justifyContent="space-between" sx={{ mb: 2 }}>
             <TextField
               name="username"

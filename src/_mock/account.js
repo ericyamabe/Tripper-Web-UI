@@ -1,8 +1,8 @@
 // ----------------------------------------------------------------------
 
 const account = {
-  displayName: 'Admin User',
-  email: 'admin@admin.com',
+  displayName: '',
+  email: '',
   photoURL: '/assets/images/avatars/avatar_default.jpg',
 };
 

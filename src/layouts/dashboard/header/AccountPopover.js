@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 // @mui
 import { alpha } from '@mui/material/styles';
 import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
@@ -26,6 +26,10 @@ const MENU_OPTIONS = [
 
 export default function AccountPopover() {
   const [open, setOpen] = useState(null);
+  const [error, setError] = useState(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [user, setUser] = useState('Guest');
+  const [email, setEmail] = useState('')
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
@@ -35,12 +39,42 @@ export default function AccountPopover() {
     setOpen(null);
   };
 
+  // fetches username from logged in user, defaults guest if not logged in
+  useEffect(() => {
+    fetch('http://localhost:8080/api/v1/whoami/', {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    })
+        .then((res) => res.json())
+        .then(
+            (data) => {
+              setIsLoaded(true);
+              if (data.username)
+                setUser(data.username);
+              if(data.email)
+                setEmail(data.email)
+              console.log(user);
+              console.log(email);
+            },
+            // Note: it's important to handle errors here
+            // instead of a catch() block so that we don't swallow
+            // exceptions from actual bugs in components.
+            (error) => {
+              setIsLoaded(true);
+              setError(error);
+            }
+        );
+  }, []);
+
+  // doesn't work yet, token issues
   const handleLogout = async (e) => {
     await fetch('http://localhost:8080/api/v1/accounts/logout/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // 'X-CSRFToken': csrf,
+         'X-CSRFToken': 'csrf',
       },
       credentials: 'include',
       body: JSON.stringify({ revoke_token: true }),
@@ -50,7 +84,6 @@ export default function AccountPopover() {
         console.log(data);
         // setIsAuthenticated(false);
         // setSuccess(false);
-        Headers.get('csrftoken');
       })
       .catch((err) => {
         console.log(err);
@@ -76,7 +109,8 @@ export default function AccountPopover() {
           }),
         }}
       >
-        <Avatar src={account.photoURL} alt="photoURL" />
+        {/* <Avatar src={account.photoURL} alt="photoURL" /> */}
+        <Avatar src={user !== 'Guest' ? account.photoURL : ''} alt="photoURL" />
       </IconButton>
 
       <Popover
@@ -100,10 +134,12 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {account.displayName}
+            {/* {account.displayName} */}
+            {isLoaded ? user : 'Loading...'}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {account.email}
+            {/* {account.email} */}
+            {isLoaded ? email : 'Loading...'}
           </Typography>
         </Box>
 
