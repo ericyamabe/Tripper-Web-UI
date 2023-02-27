@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
-import { Box, Link, Drawer, Typography, Avatar } from '@mui/material';
+import {Box, Link, Drawer, Typography, Avatar, Stack, Button} from '@mui/material';
 // mock
 import account from '../../../_mock/account';
 // hooks
@@ -13,7 +13,7 @@ import Logo from '../../../components/logo';
 import Scrollbar from '../../../components/scrollbar';
 import NavSection from '../../../components/nav-section';
 //
-import { navConfig1, navConfig2 } from './config';
+import {navConfig1, navConfig2, navConfig3, navConfig4} from './config';
 import useAuth from '../../../hooks/useAuth';
 
 // ----------------------------------------------------------------------
@@ -39,7 +39,7 @@ export default function Nav({ openNav, onCloseNav }) {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [user, setUser] = useState('Guest');
-  const [role, setRole] = useState('User');
+  const [role, setRole] = useState('');
 
   // const { isAuthenticated } = useAuth();
 
@@ -68,8 +68,8 @@ export default function Nav({ openNav, onCloseNav }) {
           setIsLoaded(true);
           if (data.username) setUser(data.username);
           if (data.role === true) setRole('Admin');
-          console.log(user);
-          console.log(role);
+          if (data.role === false) setRole('Guest');
+          if (!data.role) setRole('');
         },
         // Note: it's important to handle errors here
         // instead of a catch() block so that we don't swallow
@@ -111,24 +111,12 @@ export default function Nav({ openNav, onCloseNav }) {
           </StyledAccount>
         </Link>
       </Box>
-      {/* displays navConfig1 with Login if not logged in, navConfig2 with My Trips if logged in */}
+      {/* displays navConfig1 if not logged in, navConfig2 if logged in */}
       <NavSection data={user === 'Guest' ? navConfig1 : navConfig2} />
+      <NavSection data={role === 'Admin' ? navConfig3 : navConfig4} />
       <Box sx={{ flexGrow: 1 }} />
       {/* <Box sx={{ px: 2.5, pb: 3, mt: 10 }}> */}
       {/*   <Stack alignItems="center" spacing={3} sx={{ pt: 5, borderRadius: 2, position: 'relative' }}> */}
-      {/*     <Box */}
-      {/*       component="img" */}
-      {/*       src="/assets/illustrations/illustration_avatar.png" */}
-      {/*       sx={{ width: 100, position: 'absolute', top: -50 }} */}
-      {/*     /> */}
-      {/*     <Box sx={{ textAlign: 'center' }}> */}
-      {/*       <Typography gutterBottom variant="h6"> */}
-      {/*         Get more? */}
-      {/*       </Typography> */}
-      {/*       <Typography variant="body2" sx={{ color: 'text.secondary' }}> */}
-      {/*         From only $69 */}
-      {/*       </Typography> */}
-      {/*     </Box> */}
       {/*     <Button href="https://material-ui.com/store/items/minimal-dashboard/" target="_blank" variant="contained"> */}
       {/*       Upgrade to Pro */}
       {/*     </Button> */}
