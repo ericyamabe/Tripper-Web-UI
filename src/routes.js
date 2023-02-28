@@ -13,6 +13,8 @@ import Landing from './pages/Landing';
 import ProductsPage from './pages/ProductsPage';
 import DashboardAppPage from './pages/DashboardAppPage';
 import RegisterPage from "./pages/RegisterPage";
+import ProfilePage from "./pages/ProfilePage";
+import TripsPage from "./pages/TripsPage";
 
 // ----------------------------------------------------------------------
 
@@ -27,6 +29,8 @@ export default function Router() {
         { path: 'user', element: <UserPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
+        { path: 'profile', element: <ProfilePage /> },
+        { path: 'trips', element: <TripsPage /> },
       ],
     },
     {

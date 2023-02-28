@@ -10,6 +10,7 @@ export default function WhoAmI() {
       console.log(`You are logged in as: ${data.username}`);
       console.log(`Your user ID is: ${data.id}`);
       console.log(`Your email is: ${data.email}`);
+      console.log(`You're an admin: ${data.role}`);
     })
     .catch((err) => {
       console.log(err);

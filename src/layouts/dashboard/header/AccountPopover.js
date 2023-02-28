@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import {useNavigate} from "react-router-dom";
 // @mui
 import { alpha } from '@mui/material/styles';
 import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
@@ -7,7 +8,7 @@ import account from '../../../_mock/account';
 
 // ----------------------------------------------------------------------
 
-const MENU_OPTIONS = [
+const MENU_OPTIONS_USER = [
   {
     label: 'Home',
     icon: 'eva:home-fill',
@@ -22,10 +23,27 @@ const MENU_OPTIONS = [
   },
 ];
 
+const MENU_OPTIONS_GUEST = [
+  {
+    label: 'Home',
+    icon: 'eva:home-fill',
+  },
+  {
+    label: 'Sign In',
+    icon: 'eva:person-fill',
+  },
+];
+
 // ----------------------------------------------------------------------
 
 export default function AccountPopover() {
   const [open, setOpen] = useState(null);
+  const [error, setError] = useState(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [user, setUser] = useState('Guest');
+  const [email, setEmail] = useState('');
+
+  const navigate = useNavigate();
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
@@ -33,6 +51,55 @@ export default function AccountPopover() {
 
   const handleClose = () => {
     setOpen(null);
+  };
+
+
+
+  // fetches username from logged in user, defaults guest if not logged in
+  useEffect(() => {
+    fetch('http://localhost:8080/api/v1/whoami/', {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    })
+      .then((res) => res.json())
+      .then(
+        (data) => {
+          setIsLoaded(true);
+          if (data.username) setUser(data.username);
+          if (data.email) setEmail(data.email);
+        },
+        // Note: it's important to handle errors here
+        // instead of a catch() block so that we don't swallow
+        // exceptions from actual bugs in components.
+        (error) => {
+          setIsLoaded(true);
+          setError(error);
+        }
+      );
+  }, []);
+
+  // doesn't work yet, token issues
+  const handleLogout = async (e) => {
+    await fetch('http://localhost:8080/api/v1/accounts/logout/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': 'csrf',
+      },
+      credentials: 'include',
+      body: JSON.stringify({ revoke_token: true }),
+    })
+      // .then(isResponseOk)
+      .then((data) => {
+        console.log(data);
+        // setIsAuthenticated(false);
+        // setSuccess(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (
@@ -54,7 +121,8 @@ export default function AccountPopover() {
           }),
         }}
       >
-        <Avatar src={account.photoURL} alt="photoURL" />
+        {/* <Avatar src={account.photoURL} alt="photoURL" /> */}
+        <Avatar src={user !== 'Guest' ? account.photoURL : ''} alt="photoURL" />
       </IconButton>
 
       <Popover
@@ -78,28 +146,43 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {account.displayName}
+            {/* {account.displayName} */}
+            {isLoaded ? user : 'Loading...'}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {account.email}
+            {/* {account.email} */}
+            {isLoaded ? email : 'Loading...'}
           </Typography>
         </Box>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
+        {user !== 'Guest' ? (
+          <>
+            <Stack sx={{ p: 1 }}>
+              {MENU_OPTIONS_USER.map((option) => (
+                <MenuItem key={option.label} onClick={handleClose}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Stack>
 
-        <Stack sx={{ p: 1 }}>
-          {MENU_OPTIONS.map((option) => (
-            <MenuItem key={option.label} onClick={handleClose}>
-              {option.label}
+            <Divider sx={{ borderStyle: 'dashed' }} />
+
+            <MenuItem onClick={handleLogout} sx={{ m: 1 }}>
+              Logout
             </MenuItem>
-          ))}
-        </Stack>
-
-        <Divider sx={{ borderStyle: 'dashed' }} />
-
-        <MenuItem onClick={handleClose} sx={{ m: 1 }}>
-          Logout
-        </MenuItem>
+          </>
+        ) : (
+          <>
+            <Stack sx={{ p: 1 }}>
+              {MENU_OPTIONS_GUEST.map((option) => (
+                <MenuItem key={option.label} onClick={handleClose}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Stack>
+          </>
+        )}
       </Popover>
     </>
   );
