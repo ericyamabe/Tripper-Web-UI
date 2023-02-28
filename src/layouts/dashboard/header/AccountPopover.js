@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 // @mui
 import { alpha } from '@mui/material/styles';
 import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
+import { LOGOUT_URL, WHOAMI_URL } from '../../../sections/auth/api/urls';
 // mocks_
 import account from '../../../_mock/account';
+import GetCookie from '../../../sections/auth/api/GetCookie';
 
 // ----------------------------------------------------------------------
 
@@ -53,49 +56,55 @@ export default function AccountPopover() {
     setOpen(null);
   };
 
-
-
-  // fetches username from logged in user, defaults guest if not logged in
+  // Uses /api/v1/whoami/ to fetch username from logged in user, defaults guest if not logged in
   useEffect(() => {
-    fetch('http://localhost:8080/api/v1/whoami/', {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    })
-      .then((res) => res.json())
-      .then(
-        (data) => {
-          setIsLoaded(true);
-          if (data.username) setUser(data.username);
-          if (data.email) setEmail(data.email);
+    axios
+      .get(WHOAMI_URL, {
+        headers: {
+          'Content-Type': 'application/json',
         },
-        // Note: it's important to handle errors here
-        // instead of a catch() block so that we don't swallow
-        // exceptions from actual bugs in components.
-        (error) => {
-          setIsLoaded(true);
-          setError(error);
-        }
-      );
+        withCredentials: true,
+      })
+      .then((response) => {
+        const data = response.data;
+        if (data.username) setUser(data.username);
+        if (data.email) setEmail(data.email);
+        setIsLoaded(true);
+      })
+      .catch((error) => {
+        setIsLoaded(true);
+        setError(error);
+      });
   }, []);
 
-  // doesn't work yet, token issues
+  // checks API response is within acceptable range
+  function isResponseOk(response) {
+    if (response.status >= 200 && response.status <= 299) {
+      return response.json();
+    }
+    throw Error(response.statusText);
+  }
+
+  // used to get CSRFToken from current cookie for API calls to verify user.
+  const csrfFromCookie = GetCookie('csrftoken');
+
+  // handles logout request through POST to backend, requires CSRF token
+  // axios call won't work for some reason, but fetch does ??
   const handleLogout = async (e) => {
-    await fetch('http://localhost:8080/api/v1/accounts/logout/', {
+    e.preventDefault();
+
+    await fetch(LOGOUT_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRFToken': '{csrf_token}',
+        'X-CSRFToken': csrfFromCookie,
       },
       credentials: 'include',
-      // body: JSON.stringify({ revoke_token: true }),
     })
-      // .then(isResponseOk)
+      .then(isResponseOk)
       .then((data) => {
         console.log(data);
-        // setIsAuthenticated(false);
-        // setSuccess(false);
+        window.location.reload();
       })
       .catch((err) => {
         console.log(err);

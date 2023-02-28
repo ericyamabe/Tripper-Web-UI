@@ -4,7 +4,9 @@ import { IconButton, InputAdornment, Link, Stack, TextField, Typography } from '
 import { useNavigate } from 'react-router-dom';
 import Iconify from '../../../components/iconify';
 import axios from '../api/axios';
-import WhoAmI from '../WhoAmI';
+import WhoAmI from '../api/WhoAmI';
+import GetCookie from '../api/GetCookie';
+import {CSRF_URL, LOGIN_URL, LOGOUT_URL, SESSION_URL} from "../api/urls";
 
 // ----------------------------------------------------------------------
 /* eslint-disable camelcase */
@@ -21,42 +23,29 @@ export default function LoginForm() {
 
   const navigate = useNavigate();
 
-  // const { isAuthenticated, setIsAuthenticated } = useAuth();
-  const LOGIN_URL = '/api/v1/accounts/login/';
-  const LOGOUT_URL = '/api/v1/accounts/logout/';
-
+  // Get Started button
   const handleClick = (e) => {
     navigate('/register', { replace: true });
   };
 
+  // Will use for Login button once testing is finished
   const handleClickLogin = (e) => {
     navigate('/dashboard', { replace: true });
   };
 
+  // runs getSession function persistently on every page load
   useEffect(() => {
     getSession();
   }, []);
 
-  function getCSRF() {
-    fetch('http://localhost:8080/api/v1/get_csrf/', {
-      credentials: 'include',
-    })
-      .then((res) => {
-        const csrfToken = res.headers.get('X-CSRFToken');
-        setCsrf(csrfToken);
-        console.log(csrfToken);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-
+  // checks/sets session and verifies if isAuthenticated or not based on credentials
   function getSession() {
-    fetch('http://localhost:8080/api/v1/session/', {
-      credentials: 'include',
-    })
-      .then((res) => res.json())
-      .then((data) => {
+    axios
+      .get(SESSION_URL, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        const data = res.data;
         console.log(data);
         if (data.isAuthenticated) {
           setIsAuthenticated(true);
@@ -72,6 +61,22 @@ export default function LoginForm() {
       });
   }
 
+  // gets CSRF Token from backend
+  function getCSRF() {
+    axios
+      .get(CSRF_URL, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        const csrfToken = res.headers['x-CSRFToken'];
+        setCsrf(csrfToken);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  // checks API response is within acceptable range
   function isResponseOk(response) {
     if (response.status >= 200 && response.status <= 299) {
       return response.json();
@@ -79,22 +84,23 @@ export default function LoginForm() {
     throw Error(response.statusText);
   }
 
+  // used to get CSRFToken from current cookie for API calls to verify user.
+  const csrfFromCookie = GetCookie('csrftoken');
+
+  // handles login request through POST to backend, requires credentials and CSRF token
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
       const response = await axios.post(LOGIN_URL, JSON.stringify({ login, password }), {
-        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrf },
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfFromCookie },
         withCredentials: true,
       });
       console.log(JSON.stringify(response?.data));
-      // console.log(JSON.stringify(response));
-      getCSRF();
-      // setAuth({ login, password, csrf });
       setLogin('');
       setPassword('');
       setError('');
-      // setIsAuthenticated(true);
+      setIsAuthenticated(true);
       setSuccess(true);
       setIsLoaded(true);
     } catch (err) {
@@ -108,59 +114,37 @@ export default function LoginForm() {
         setError('Login Failed');
       }
     }
-
-
-
-    // fetch('http://localhost:8080/api/v1/accounts/login/', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'X-CSRFToken': csrf,
-    //   },
-    //   credentials: 'include',
-    //   body: JSON.stringify({ login, password }),
-    // })
-    //   .then(isResponseOk)
-    //   .then((data) => {
-    //     console.log(data);
-    //     setIsAuthenticated(true);
-    //     setLogin('');
-    //     setPassword('');
-    //     setError('');
-    //     setSuccess(true);
-    //     getCSRF();
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //     setError('Wrong username or password.');
-    //   });
   };
 
+  // handles logout request through POST to backend, requires CSRF token
+  // axios call won't work for some reason, but fetch does ??
   const handleLogout = async (e) => {
-    await fetch('http://localhost:8080/api/v1/accounts/logout/', {
+    e.preventDefault();
+
+    await fetch(LOGOUT_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRFToken': csrf,
+        'X-CSRFToken': csrfFromCookie,
       },
       credentials: 'include',
-      // body: JSON.stringify({ revoke_token: true }),
     })
       .then(isResponseOk)
       .then((data) => {
         console.log(data);
         setIsAuthenticated(false);
         setSuccess(false);
-        // Headers.get('csrftoken');
       })
       .catch((err) => {
         console.log(err);
       });
   };
 
+  // if awaiting API response
   if (!isLoaded) {
     return <div>Loading...</div>;
   }
+  // if user is authenticated
   if (isAuthenticated) {
     return (
       <div className="container mt-3">
@@ -177,8 +161,10 @@ export default function LoginForm() {
       </div>
     );
   }
+  // if user is not authenticated
   return (
     <>
+      {/* On successful login, shows this */}
       {success ? (
         <div className="container mt-3">
           <p>You are logged in!</p>
@@ -193,6 +179,7 @@ export default function LoginForm() {
           </button>
         </div>
       ) : (
+        // Prior to login, shows this
         <section>
           <Typography variant="h4" gutterBottom>
             Sign in to Tripper

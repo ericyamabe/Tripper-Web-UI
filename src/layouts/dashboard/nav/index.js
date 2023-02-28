@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import axios from 'axios';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
 import { Box, Link, Drawer, Typography, Avatar, Stack, Button } from '@mui/material';
@@ -15,6 +16,7 @@ import NavSection from '../../../components/nav-section';
 //
 import { navConfig1, navConfig2, navConfig3, navConfig4 } from './config';
 import useAuth from '../../../hooks/useAuth';
+import { WHOAMI_URL } from '../../../sections/auth/api/urls';
 
 // ----------------------------------------------------------------------
 
@@ -55,30 +57,52 @@ export default function Nav({ openNav, onCloseNav }) {
   }, [pathname]);
 
   // fetches username from logged in user, defaults guest if not logged in
+  // useEffect(() => {
+  //   fetch('http://localhost:8080/api/v1/whoami/', {
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     credentials: 'include',
+  //   })
+  //     .then((res) => res.json())
+  //     .then(
+  //       (data) => {
+  //         setIsLoaded(true);
+  //         if (data.username) setUser(data.username);
+  //         if (data.role === true) setRole('Admin');
+  //         if (data.role === false) setRole('Guest');
+  //         if (!data.role) setRole('');
+  //       },
+  //       // Note: it's important to handle errors here
+  //       // instead of a catch() block so that we don't swallow
+  //       // exceptions from actual bugs in components.
+  //       (error) => {
+  //         setIsLoaded(true);
+  //         setError(error);
+  //       }
+  //     );
+  // }, []);
+
   useEffect(() => {
-    fetch('http://localhost:8080/api/v1/whoami/', {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    })
-      .then((res) => res.json())
-      .then(
-        (data) => {
-          setIsLoaded(true);
-          if (data.username) setUser(data.username);
-          if (data.role === true) setRole('Admin');
-          if (data.role === false) setRole('Guest');
-          if (!data.role) setRole('');
+    axios
+      .get(WHOAMI_URL, {
+        headers: {
+          'Content-Type': 'application/json',
         },
-        // Note: it's important to handle errors here
-        // instead of a catch() block so that we don't swallow
-        // exceptions from actual bugs in components.
-        (error) => {
-          setIsLoaded(true);
-          setError(error);
-        }
-      );
+        withCredentials: true,
+      })
+      .then((response) => {
+        const data = response.data;
+        setIsLoaded(true);
+        if (data.username) setUser(data.username);
+        if (data.role === true) setRole('Admin');
+        if (data.role === false) setRole('Guest');
+        if (!data.role) setRole('');
+      })
+      .catch((error) => {
+        setIsLoaded(true);
+        setError(error);
+      });
   }, []);
 
   const renderContent = (
