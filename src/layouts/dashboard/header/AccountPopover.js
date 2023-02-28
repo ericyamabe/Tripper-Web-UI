@@ -86,10 +86,10 @@ export default function AccountPopover() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRFToken': 'csrf',
+        'X-CSRFToken': '{csrf_token}',
       },
       credentials: 'include',
-      body: JSON.stringify({ revoke_token: true }),
+      // body: JSON.stringify({ revoke_token: true }),
     })
       // .then(isResponseOk)
       .then((data) => {

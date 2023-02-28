@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { LoadingButton } from '@mui/lab';
 import { IconButton, InputAdornment, Link, Stack, TextField, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import useAuth from '../../../hooks/useAuth';
 import Iconify from '../../../components/iconify';
 import axios from '../api/axios';
 import WhoAmI from '../WhoAmI';
@@ -39,7 +38,7 @@ export default function LoginForm() {
   }, []);
 
   function getCSRF() {
-    fetch('http://localhost:8080/api/v1/csrf/', {
+    fetch('http://localhost:8080/api/v1/get_csrf/', {
       credentials: 'include',
     })
       .then((res) => {
@@ -110,6 +109,8 @@ export default function LoginForm() {
       }
     }
 
+
+
     // fetch('http://localhost:8080/api/v1/accounts/login/', {
     //   method: 'POST',
     //   headers: {
@@ -143,14 +144,14 @@ export default function LoginForm() {
         'X-CSRFToken': csrf,
       },
       credentials: 'include',
-      body: JSON.stringify({ revoke_token: true }),
+      // body: JSON.stringify({ revoke_token: true }),
     })
       .then(isResponseOk)
       .then((data) => {
         console.log(data);
         setIsAuthenticated(false);
         setSuccess(false);
-        Headers.get('csrftoken');
+        // Headers.get('csrftoken');
       })
       .catch((err) => {
         console.log(err);
