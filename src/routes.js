@@ -7,6 +7,9 @@ import BlogPage from './pages/BlogPage';
 import UserPage from './pages/UserPage';
 import LoginPage from './pages/LoginPage';
 import Page404 from './pages/Page404';
+import VerifyEmailPage from './pages/VerifyEmailPage';
+
+import Landing from './pages/Landing';
 import ProductsPage from './pages/ProductsPage';
 import DashboardAppPage from './pages/DashboardAppPage';
 import RegisterPage from "./pages/RegisterPage";
@@ -31,13 +34,23 @@ export default function Router() {
       element: <LoginPage />,
     },
     {
-      path: 'register',
-      element: <RegisterPage />,
+      path: 'landing',
+      element: <Landing />,
     },
+    {
+      path: 'VerifyEmailPage',
+      element: <VerifyEmailPage />,
+      
+    },
+    {      
+      path: 'register',
+      element: <RegisterPage />,},
     {
       element: <SimpleLayout />,
       children: [
-        { element: <Navigate to="/dashboard/app" />, index: true },
+        // Change this back to "/dashboard/app" when landing page is deprecated
+        // { element: <Navigate to="/dashboard/app" />, index: true },
+        { element: <Navigate to="/landing" />, index: true },
         { path: '404', element: <Page404 /> },
         { path: '*', element: <Navigate to="/404" /> },
       ],

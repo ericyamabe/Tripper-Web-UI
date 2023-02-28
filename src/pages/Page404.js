@@ -42,7 +42,8 @@ export default function Page404() {
             sx={{ height: 260, mx: 'auto', my: { xs: 5, sm: 10 } }}
           />
 
-          <Button to="/" size="large" variant="contained" component={RouterLink}>
+          {/* Change this back to "/" when landing page is deprecated */}
+          <Button to="/dashboard" size="large" variant="contained" component={RouterLink}>
             Go to Home
           </Button>
         </StyledContent>
