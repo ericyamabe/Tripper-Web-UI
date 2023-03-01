@@ -16,6 +16,7 @@ import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import TripsPage from './pages/TripsPage';
 import AddTripPage from './pages/AddTripPage';
+import EditTripPage from "./pages/EditTripPage";
 
 // ----------------------------------------------------------------------
 
@@ -33,6 +34,7 @@ export default function Router() {
         { path: 'profile', element: <ProfilePage /> },
         { path: 'trips', element: <TripsPage /> },
         { path: 'trips/addtrip', element: <AddTripPage /> },
+        { path: 'trips/edittrip', element: <EditTripPage /> },
       ],
     },
     {

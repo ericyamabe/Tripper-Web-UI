@@ -131,6 +131,13 @@ export default function TripsPage() {
     navigate('addtrip', { replace: true });
   };
 
+  const handleDeleteTrip = () => {
+  };
+
+  const handleEditTrip = () => {
+    navigate('editTrip', { replace: true });
+  }
+
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -316,12 +323,12 @@ export default function TripsPage() {
         }}
       >
         <MenuItem>
-          <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
+          <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} onClick={handleEditTrip}/>
           Edit
         </MenuItem>
 
         <MenuItem sx={{ color: 'error.main' }}>
-          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
+          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} onClick={handleDeleteTrip}/>
           Delete
         </MenuItem>
       </Popover>

@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 // @mui
 import { Box, Button, Card, Container, Grid, Stack, TextField, Typography } from '@mui/material';
 import Iconify from '../components/iconify';
 import axios from '../sections/auth/api/axios';
-import { TRIP_CREATE_URL } from '../sections/auth/api/urls';
+import { TRIP_UPDATE_URL } from '../sections/auth/api/urls';
 import GetCookie from '../sections/auth/api/GetCookie';
 /* eslint-disable camelcase */
 
-export default function AddTripPage() {
+export default function EditTripPage() {
   const [name, setName] = useState('');
   const [start, setStart] = useState('');
   const [destination, setDestination] = useState('');
@@ -46,7 +46,7 @@ export default function AddTripPage() {
     // formData.append('misc', misc);
 
     try {
-      const response = await axios.post(TRIP_CREATE_URL, formData, {
+      const response = await axios.post(TRIP_UPDATE_URL, formData, {
         headers: { 'Content-Type': 'multipart/form-data', 'X-CSRFToken': csrfFromCookie },
         withCredentials: true,
       });
@@ -65,19 +65,19 @@ export default function AddTripPage() {
   return (
     <>
       <Helmet>
-        <title> Add Trip | Tripper </title>
+        <title> Edit Trip | Tripper </title>
       </Helmet>
 
       <Container maxWidth="xl">
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Add New Trip
+            Edit Trip
           </Typography>
         </Stack>
         <Card>
           <Grid container alignItems="center" justifyContent="center" spacing={3}>
             <Grid item xs={12} md={6} lg={8}>
-              <Box py={5} >
+              <Box py={5}>
                 <form onSubmit={handleSubmit}>
                   <Stack spacing={2}>
                     <TextField
