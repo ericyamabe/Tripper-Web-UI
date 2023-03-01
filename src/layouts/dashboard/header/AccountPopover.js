@@ -21,9 +21,13 @@ const MENU_OPTIONS_USER = [
     icon: 'eva:person-fill',
   },
   {
-    label: 'Settings',
-    icon: 'eva:settings-2-fill',
+    label: 'My Trips',
+    icon: 'eva:person-fill',
   },
+  // {
+  //   label: 'Settings',
+  //   icon: 'eva:settings-2-fill',
+  // },
 ];
 
 const MENU_OPTIONS_GUEST = [
@@ -52,7 +56,12 @@ export default function AccountPopover() {
     setOpen(event.currentTarget);
   };
 
-  const handleClose = () => {
+  const handleClose = (e) => {
+    // console.log(e.target.innerText);
+    if (e.target.innerText === 'Home') navigate('/dashboard/app', { replace: true });
+    if (e.target.innerText === 'Profile') navigate('/dashboard/profile', { replace: true });
+    if (e.target.innerText === 'My Trips') navigate('/dashboard/trips', { replace: true });
+    if (e.target.innerText === 'Sign In') navigate('/login', { replace: true });
     setOpen(null);
   };
 

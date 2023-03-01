@@ -43,8 +43,6 @@ export default function Nav({ openNav, onCloseNav }) {
   const [user, setUser] = useState('Guest');
   const [role, setRole] = useState('');
 
-  // const { isAuthenticated } = useAuth();
-
   const { pathname } = useLocation();
 
   const isDesktop = useResponsive('up', 'lg');
@@ -57,32 +55,6 @@ export default function Nav({ openNav, onCloseNav }) {
   }, [pathname]);
 
   // fetches username from logged in user, defaults guest if not logged in
-  // useEffect(() => {
-  //   fetch('http://localhost:8080/api/v1/whoami/', {
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     credentials: 'include',
-  //   })
-  //     .then((res) => res.json())
-  //     .then(
-  //       (data) => {
-  //         setIsLoaded(true);
-  //         if (data.username) setUser(data.username);
-  //         if (data.role === true) setRole('Admin');
-  //         if (data.role === false) setRole('Guest');
-  //         if (!data.role) setRole('');
-  //       },
-  //       // Note: it's important to handle errors here
-  //       // instead of a catch() block so that we don't swallow
-  //       // exceptions from actual bugs in components.
-  //       (error) => {
-  //         setIsLoaded(true);
-  //         setError(error);
-  //       }
-  //     );
-  // }, []);
-
   useEffect(() => {
     axios
       .get(WHOAMI_URL, {
@@ -93,11 +65,11 @@ export default function Nav({ openNav, onCloseNav }) {
       })
       .then((response) => {
         const data = response.data;
-        setIsLoaded(true);
         if (data.username) setUser(data.username);
         if (data.role === true) setRole('Admin');
         if (data.role === false) setRole('Guest');
         if (!data.role) setRole('');
+        setIsLoaded(true);
       })
       .catch((error) => {
         setIsLoaded(true);
