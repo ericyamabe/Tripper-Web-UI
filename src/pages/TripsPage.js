@@ -2,6 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { filter, sample } from 'lodash';
 import { sentenceCase } from 'change-case';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 // @mui
 import {
@@ -86,6 +87,8 @@ export default function TripsPage() {
   const [error, setError] = useState(null);
   const [trips, setTrips] = useState([]);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     fetchTrips();
   }, []);
@@ -96,8 +99,6 @@ export default function TripsPage() {
         withCredentials: true,
       });
       setTrips(res.data);
-      // const data = res.data;
-      // console.log(data);
       console.log(trips);
       setIsLoaded(true);
     } catch (err) {
@@ -108,7 +109,7 @@ export default function TripsPage() {
     }
   }
 
-  const tripss = [...Array(trips.length)].map((_, index) => ({
+  const TRIPSLIST = [...Array(trips.length)].map((_, index) => ({
     uuid: trips[index].uuid,
     avatarUrl: `/assets/images/avatars/avatar_${index + 1}.jpg`,
     name: trips[index].name,
@@ -126,6 +127,10 @@ export default function TripsPage() {
     setOpen(null);
   };
 
+  const handleAddTrip = () => {
+    navigate('addtrip', { replace: true });
+  };
+
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -134,7 +139,7 @@ export default function TripsPage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = tripss.map((n) => n.name);
+      const newSelecteds = TRIPSLIST.map((n) => n.name);
       setSelected(newSelecteds);
       return;
     }
@@ -170,9 +175,9 @@ export default function TripsPage() {
     setFilterName(event.target.value);
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - tripss.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - TRIPSLIST.length) : 0;
 
-  const filteredUsers = applySortFilter(tripss, getComparator(order, orderBy), filterName);
+  const filteredUsers = applySortFilter(TRIPSLIST, getComparator(order, orderBy), filterName);
 
   const isNotFound = !filteredUsers.length && !!filterName;
 
@@ -187,7 +192,7 @@ export default function TripsPage() {
           <Typography variant="h4" gutterBottom>
             Trips
           </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
+          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleAddTrip}>
             Add Trip
           </Button>
         </Stack>
@@ -202,7 +207,7 @@ export default function TripsPage() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={tripss.length}
+                  rowCount={TRIPSLIST.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
@@ -283,7 +288,7 @@ export default function TripsPage() {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={tripss.length}
+            count={TRIPSLIST.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
