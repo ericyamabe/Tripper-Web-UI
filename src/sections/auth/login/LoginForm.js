@@ -3,8 +3,13 @@ import { LoadingButton } from '@mui/lab';
 import { IconButton, InputAdornment, Link, Stack, TextField, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Iconify from '../../../components/iconify';
+import axios from '../api/axios';
+import WhoAmI from '../api/WhoAmI';
+import GetCookie from '../api/GetCookie';
+import {CSRF_URL, LOGIN_URL, LOGOUT_URL, SESSION_URL} from "../api/urls";
 
 // ----------------------------------------------------------------------
+/* eslint-disable camelcase */
 
 export default function LoginForm() {
   const [csrf, setCsrf] = useState('');
@@ -12,46 +17,41 @@ export default function LoginForm() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const navigate = useNavigate();
 
+  // Get Started button
   const handleClick = (e) => {
     navigate('/register', { replace: true });
   };
 
+  // Will use for Login button once testing is finished
   const handleClickLogin = (e) => {
-    navigate('/', { replace: true });
+    navigate('/dashboard', { replace: true });
   };
 
+  // runs getSession function persistently on every page load
   useEffect(() => {
     getSession();
   }, []);
 
-  function getCSRF() {
-    fetch('http://localhost:8080/api/v1/csrf/', {
-      credentials: 'include',
-    })
-      .then((res) => {
-        const csrfToken = res.headers.get('X-CSRFToken');
-        setCsrf(csrfToken);
-        console.log(csrfToken);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-
+  // checks/sets session and verifies if isAuthenticated or not based on credentials
   function getSession() {
-    fetch('http://localhost:8080/api/v1/session/', {
-      credentials: 'include',
-    })
-      .then((res) => res.json())
-      .then((data) => {
+    axios
+      .get(SESSION_URL, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        const data = res.data;
         console.log(data);
         if (data.isAuthenticated) {
           setIsAuthenticated(true);
+          setIsLoaded(true);
         } else {
+          setIsLoaded(true);
           setIsAuthenticated(false);
           getCSRF();
         }
@@ -61,6 +61,22 @@ export default function LoginForm() {
       });
   }
 
+  // gets CSRF Token from backend
+  function getCSRF() {
+    axios
+      .get(CSRF_URL, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        const csrfToken = res.headers['x-CSRFToken'];
+        setCsrf(csrfToken);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  // checks API response is within acceptable range
   function isResponseOk(response) {
     if (response.status >= 200 && response.status <= 299) {
       return response.json();
@@ -68,152 +84,159 @@ export default function LoginForm() {
     throw Error(response.statusText);
   }
 
-  function userLogin(event) {
-    event.preventDefault();
-    fetch('http://localhost:8080/api/v1/accounts/login/', {
+  // used to get CSRFToken from current cookie for API calls to verify user.
+  const csrfFromCookie = GetCookie('csrftoken');
+
+  // handles login request through POST to backend, requires credentials and CSRF token
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post(LOGIN_URL, JSON.stringify({ login, password }), {
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfFromCookie },
+        withCredentials: true,
+      });
+      console.log(JSON.stringify(response?.data));
+      setLogin('');
+      setPassword('');
+      setError('');
+      setIsAuthenticated(true);
+      setSuccess(true);
+      setIsLoaded(true);
+    } catch (err) {
+      if (!err?.response) {
+        setError('No Server Response');
+      } else if (err.response?.status === 400) {
+        setError('Wrong username or password.');
+      } else if (err.response?.status === 401) {
+        setError('Unauthorized');
+      } else {
+        setError('Login Failed');
+      }
+    }
+  };
+
+  // handles logout request through POST to backend, requires CSRF token
+  // axios call won't work for some reason, but fetch does ??
+  const handleLogout = async (e) => {
+    e.preventDefault();
+
+    await fetch(LOGOUT_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRFToken': csrf,
+        'X-CSRFToken': csrfFromCookie,
       },
-      credentials: 'include',
-      body: JSON.stringify({ login, password }),
-    })
-      .then(isResponseOk)
-      .then((data) => {
-        console.log(data);
-        setIsAuthenticated(true);
-        setLogin('');
-        setPassword('');
-        setError('');
-      })
-      .catch((err) => {
-        console.log(err);
-        setError('Wrong username or password.');
-      });
-  }
-
-  function logout() {
-    fetch('http://localhost:8080/api/v1/logout', {
       credentials: 'include',
     })
       .then(isResponseOk)
       .then((data) => {
         console.log(data);
         setIsAuthenticated(false);
-        getCSRF();
+        setSuccess(false);
       })
       .catch((err) => {
         console.log(err);
       });
-  }
+  };
 
-  function whoami() {
-    fetch('http://localhost:8080/api/v1/whoami/', {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(`You are logged in as: ${data.username}`);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  // if awaiting API response
+  if (!isLoaded) {
+    return <div>Loading...</div>;
   }
-
-  if (!isAuthenticated) {
+  // if user is authenticated
+  if (isAuthenticated) {
     return (
-      <>
-        <Typography variant="h4" gutterBottom>
-          Sign in to Tripper
-        </Typography>
-
-        <Typography variant="body2" sx={{ mb: 5 }}>
-          Don’t have an account? {''}
-          <Link component="button" variant="subtitle2" onClick={handleClick}>
-            Get started
-          </Link>
-        </Typography>
-
-        {/* <Stack direction="row" spacing={2}> */}
-        {/*   <Button fullWidth size="large" color="inherit" variant="outlined"> */}
-        {/*     <Iconify icon="eva:google-fill" color="#DF3E30" width={22} height={22} /> */}
-        {/*   </Button> */}
-
-        {/*   <Button fullWidth size="large" color="inherit" variant="outlined"> */}
-        {/*     <Iconify icon="eva:facebook-fill" color="#1877F2" width={22} height={22} /> */}
-        {/*   </Button> */}
-
-        {/*   <Button fullWidth size="large" color="inherit" variant="outlined"> */}
-        {/*     <Iconify icon="eva:twitter-fill" color="#1C9CEA" width={22} height={22} /> */}
-        {/*   </Button> */}
-        {/* </Stack> */}
-
-        {/* <Divider sx={{ my: 3 }}> */}
-        {/*   <Typography variant="body2" sx={{ color: 'text.secondary' }}> */}
-        {/*     OR */}
-        {/*   </Typography> */}
-        {/* </Divider> */}
-
-        <form onSubmit={userLogin}>
-          <Stack spacing={3}>
-            <TextField
-              name="login"
-              label="Username"
-              id="login"
-              defaultValue={login}
-              onChange={(e) => setLogin(e.target.value)}
-            />
-
-            <TextField
-              name="password"
-              label="Password"
-              id="password"
-              defaultValue={password}
-              onChange={(e) => setPassword(e.target.value)}
-              type={showPassword ? 'text' : 'password'}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                      <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Stack>
-          <div>{error && <small className="text-danger">{error}</small>}</div>
-
-          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
-            {/* <Checkbox name="remember" label="Remember me" /> */}
-            <Link variant="subtitle2" underline="hover">
-              Forgot password?
-            </Link>
-          </Stack>
-
-          {/* <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleClick}> */}
-          {/* <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleClickLogin}> */}
-          <LoadingButton fullWidth size="large" type="submit" variant="contained">
-            Login
-          </LoadingButton>
-        </form>
-      </>
+      <div className="container mt-3">
+        <p>You are logged in!</p>
+        <button type="button" className="btn btn-primary mr-2" onClick={WhoAmI}>
+          WhoAmI
+        </button>
+        <button type="button" className="btn btn-danger" onClick={handleClickLogin}>
+          Home
+        </button>
+        <button type="button" className="btn btn-danger" onClick={handleLogout}>
+          Log out
+        </button>
+      </div>
     );
   }
-
+  // if user is not authenticated
   return (
-    <div className="container mt-3">
-      <p>You are logged in!</p>
-      <button type="button" className="btn btn-primary mr-2" onClick={whoami}>
-        WhoAmI
-      </button>
-      <button type="button" className="btn btn-danger" onClick={logout}>
-        Log out
-      </button>
-    </div>
+    <>
+      {/* On successful login, shows this */}
+      {success ? (
+        <div className="container mt-3">
+          <p>You are logged in!</p>
+          <button type="button" className="btn btn-primary mr-2" onClick={WhoAmI}>
+            WhoAmI
+          </button>
+          <button type="button" className="btn btn-danger" onClick={handleClickLogin}>
+            Home
+          </button>
+          <button type="button" className="btn btn-danger" onClick={handleLogout}>
+            Log out
+          </button>
+        </div>
+      ) : (
+        // Prior to login, shows this
+        <section>
+          <Typography variant="h4" gutterBottom>
+            Sign in to Tripper
+          </Typography>
+
+          <Typography variant="body2" sx={{ mb: 5 }}>
+            Don’t have an account? {''}
+            <Link component="button" variant="subtitle2" onClick={handleClick}>
+              Get started
+            </Link>
+          </Typography>
+
+          <form onSubmit={handleLogin}>
+            <Stack spacing={3}>
+              <TextField
+                name="login"
+                label="Username"
+                id="login"
+                defaultValue={login}
+                onChange={(e) => setLogin(e.target.value)}
+              />
+
+              <TextField
+                name="password"
+                label="Password"
+                id="password"
+                defaultValue={password}
+                onChange={(e) => setPassword(e.target.value)}
+                type={showPassword ? 'text' : 'password'}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                        <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Stack>
+            <div>{error && <small className="text-danger">{error}</small>}</div>
+
+            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
+              {/* <Checkbox name="remember" label="Remember me" /> */}
+              <Link variant="subtitle2" underline="hover">
+                Forgot password?
+              </Link>
+            </Stack>
+
+            {/* <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleClick}> */}
+            {/* <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleClickLogin}> */}
+            <LoadingButton fullWidth size="large" type="submit" variant="contained">
+              Login
+            </LoadingButton>
+          </form>
+        </section>
+      )}
+    </>
   );
 }
