@@ -136,7 +136,7 @@ export default function TripsPage() {
   };
 
   const handleEditTrip = (e) => {
-    console.log(trips[1].uuid) // need to get array index of selected row
+    // console.log(trips[1].uuid) // need to get array index of selected row
     // setEditUuid(trips[1]);
     navigate('editTrip', { replace: true });
     // if (e.target.innerText === 'Edit') navigate('/dashboard/trips/edittrip', { replace: true });
