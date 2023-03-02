@@ -4,9 +4,9 @@ import { IconButton, InputAdornment, Link, Stack, TextField, Typography } from '
 import { useNavigate } from 'react-router-dom';
 import Iconify from '../../../components/iconify';
 import axios from '../api/axios';
-import WhoAmI from '../api/WhoAmI';
+// import WhoAmI from '../api/WhoAmI';
 import GetCookie from '../api/GetCookie';
-import {CSRF_URL, LOGIN_URL, LOGOUT_URL, SESSION_URL} from "../api/urls";
+import { CSRF_URL, LOGIN_URL, LOGOUT_URL, SESSION_URL } from '../api/urls';
 
 // ----------------------------------------------------------------------
 /* eslint-disable camelcase */
@@ -147,18 +147,19 @@ export default function LoginForm() {
   // if user is authenticated
   if (isAuthenticated) {
     return (
-      <div className="container mt-3">
-        <p>You are logged in!</p>
-        <button type="button" className="btn btn-primary mr-2" onClick={WhoAmI}>
-          WhoAmI
-        </button>
-        <button type="button" className="btn btn-danger" onClick={handleClickLogin}>
-          Home
-        </button>
-        <button type="button" className="btn btn-danger" onClick={handleLogout}>
-          Log out
-        </button>
-      </div>
+      navigate('/dashboard', { replace: true })
+      // <div className="container mt-3">
+      //   <p>You are logged in!</p>
+      //   <button type="button" className="btn btn-primary mr-2" onClick={WhoAmI}>
+      //     WhoAmI
+      //   </button>
+      //   <button type="button" className="btn btn-danger" onClick={handleClickLogin}>
+      //     Home
+      //   </button>
+      //   <button type="button" className="btn btn-danger" onClick={handleLogout}>
+      //     Log out
+      //   </button>
+      // </div>
     );
   }
   // if user is not authenticated
@@ -166,18 +167,19 @@ export default function LoginForm() {
     <>
       {/* On successful login, shows this */}
       {success ? (
-        <div className="container mt-3">
-          <p>You are logged in!</p>
-          <button type="button" className="btn btn-primary mr-2" onClick={WhoAmI}>
-            WhoAmI
-          </button>
-          <button type="button" className="btn btn-danger" onClick={handleClickLogin}>
-            Home
-          </button>
-          <button type="button" className="btn btn-danger" onClick={handleLogout}>
-            Log out
-          </button>
-        </div>
+        // <div className="container mt-3">
+        //   <p>You are logged in!</p>
+        //   <button type="button" className="btn btn-primary mr-2" onClick={WhoAmI}>
+        //     WhoAmI
+        //   </button>
+        //   <button type="button" className="btn btn-danger" onClick={handleClickLogin}>
+        //     Home
+        //   </button>
+        //   <button type="button" className="btn btn-danger" onClick={handleLogout}>
+        //     Log out
+        //   </button>
+        // </div>
+        navigate('/dashboard', { replace: true })
       ) : (
         // Prior to login, shows this
         <section>

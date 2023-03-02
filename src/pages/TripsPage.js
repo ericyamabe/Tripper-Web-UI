@@ -25,7 +25,7 @@ import {
   TablePagination,
 } from '@mui/material';
 // components
-import { faker } from '@faker-js/faker';
+// import { faker } from '@faker-js/faker';
 import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
@@ -116,7 +116,7 @@ export default function TripsPage() {
     destination: trips[index].destination,
     start_date: trips[index].start_date,
     end_date: trips[index].end_date,
-    status: sample(['complete', 'planned']),
+    status: sample(['complete', 'planned']), // lodash fake data
   }));
 
   const handleOpenMenu = (event) => {
@@ -132,11 +132,15 @@ export default function TripsPage() {
   };
 
   const handleDeleteTrip = () => {
+    // delete function not yet added
   };
 
-  const handleEditTrip = () => {
+  const handleEditTrip = (e) => {
+    console.log(trips[1].uuid) // need to get array index of selected row
+    // setEditUuid(trips[1]);
     navigate('editTrip', { replace: true });
-  }
+    // if (e.target.innerText === 'Edit') navigate('/dashboard/trips/edittrip', { replace: true });
+  };
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -322,13 +326,13 @@ export default function TripsPage() {
           },
         }}
       >
-        <MenuItem>
-          <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} onClick={handleEditTrip}/>
+        <MenuItem onClick={handleEditTrip}>
+          <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
           Edit
         </MenuItem>
 
         <MenuItem sx={{ color: 'error.main' }}>
-          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} onClick={handleDeleteTrip}/>
+          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
           Delete
         </MenuItem>
       </Popover>

@@ -180,8 +180,8 @@ export default function EditTripPage() {
                     {/*   }} */}
                     {/* /> */}
                     <div>{error && <small className="text-danger">{error}</small>}</div>
-                    <Button variant="contained" type="submit" startIcon={<Iconify icon="eva:plus-fill" />}>
-                      Add Trip
+                    <Button variant="contained" type="submit">
+                      Edit Trip
                     </Button>
                   </Stack>
                 </form>
