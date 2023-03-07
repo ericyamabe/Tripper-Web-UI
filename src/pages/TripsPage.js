@@ -226,11 +226,11 @@ export default function TripsPage() {
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                     // eslint-disable-next-line camelcase
-                    const { id, name, start_date, status, destination, avatarUrl, end_date } = row;
+                    const { uuid, name, start_date, status, destination, avatarUrl, end_date } = row;
                     const selectedUser = selected.indexOf(name) !== -1;
 
                     return (
-                      <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                      <TableRow hover key={uuid} tabIndex={-1} role="checkbox" selected={selectedUser}>
                         <TableCell padding="checkbox">
                           <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, name)} />
                         </TableCell>
@@ -326,6 +326,11 @@ export default function TripsPage() {
           },
         }}
       >
+        <MenuItem>
+          <Iconify icon={'ic:baseline-remove-red-eye'} sx={{ mr: 2 }} />
+          View
+        </MenuItem>
+
         <MenuItem onClick={handleEditTrip}>
           <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
           Edit

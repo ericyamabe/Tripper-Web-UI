@@ -1,10 +1,17 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 // import ReactApexChart from 'react-apexcharts';
 // @mui
 import { Box, Card, CardHeader } from '@mui/material';
 // Google Maps API
-import { GoogleMap, MarkerF, useLoadScript, StandaloneSearchBox } from '@react-google-maps/api';
+import {
+  GoogleMap,
+  MarkerF,
+  useLoadScript,
+  StandaloneSearchBox,
+  DirectionsService,
+  DirectionsRenderer,
+} from '@react-google-maps/api';
 // useMemo
 import './map.css';
 
@@ -15,16 +22,44 @@ AppGoogleMapsAPI.propTypes = {
   subheader: PropTypes.string,
 };
 
-const lib = ['places'];
+const lib = ['places', 'routes'];
+const options = {};
 
 function Map() {
   const center = useMemo(() => ({ lat: 34.2407, lng: -118.53 }), []);
-
   const [searchBox, setSearchBox] = useState(null);
+  const [origin, setOrigin] = useState('');
+  const [destination, setDestination] = useState('');
+  const [response, setResponse] = useState(null);
 
+  // search box
   const onPlacesChanged = () => console.log(searchBox.getPlaces());
+  // search box
   const onSBLoad = (ref) => {
     setSearchBox(ref);
+  };
+
+  const count = useRef(0);
+
+  // directions
+  const directionsCallback = (response) => {
+    console.log(response);
+
+    if (response !== null && count.current < 2) {
+      if (response.status === 'OK') {
+        count.current += 1;
+        setResponse(response);
+      } else {
+        count.current = 0;
+        console.log('response: ', response);
+      }
+    }
+  };
+
+  const directionsServiceOptions = {
+    destination,
+    origin,
+    travelMode: 'DRIVING', // default, can change to other modes
   };
 
   return (
@@ -52,6 +87,15 @@ function Map() {
             }}
           />
         </StandaloneSearchBox>
+        {response !== null && (
+          <DirectionsRenderer
+            options={{
+              directions: response,
+            }}
+          />
+        )}
+
+        <DirectionsService options={directionsServiceOptions} callback={(e) => directionsCallback(e)} />
       </>
 
       <MarkerF title={'CSUN'} name={'CSUN'} key={1} position={center} />
@@ -61,7 +105,8 @@ function Map() {
 
 function MapComponent() {
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY, libraries: lib,
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+    libraries: lib,
   });
 
   if (!isLoaded) return <div>Loading...</div>;

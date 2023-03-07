@@ -6,7 +6,7 @@ import Iconify from '../../../components/iconify';
 import axios from '../api/axios';
 // import WhoAmI from '../api/WhoAmI';
 import GetCookie from '../api/GetCookie';
-import { CSRF_URL, LOGIN_URL, LOGOUT_URL, SESSION_URL } from '../api/urls';
+import { CSRF_URL, LOGIN_URL, SESSION_URL } from '../api/urls';
 
 // ----------------------------------------------------------------------
 /* eslint-disable camelcase */
@@ -118,27 +118,27 @@ export default function LoginForm() {
 
   // handles logout request through POST to backend, requires CSRF token
   // axios call won't work for some reason, but fetch does ??
-  const handleLogout = async (e) => {
-    e.preventDefault();
-
-    await fetch(LOGOUT_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrfFromCookie,
-      },
-      credentials: 'include',
-    })
-      .then(isResponseOk)
-      .then((data) => {
-        console.log(data);
-        setIsAuthenticated(false);
-        setSuccess(false);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+  // const handleLogout = async (e) => {
+  //   e.preventDefault();
+  //
+  //   await fetch(LOGOUT_URL, {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       'X-CSRFToken': csrfFromCookie,
+  //     },
+  //     credentials: 'include',
+  //   })
+  //     .then(isResponseOk)
+  //     .then((data) => {
+  //       console.log(data);
+  //       setIsAuthenticated(false);
+  //       setSuccess(false);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // };
 
   // if awaiting API response
   if (!isLoaded) {
@@ -146,99 +146,67 @@ export default function LoginForm() {
   }
   // if user is authenticated
   if (isAuthenticated) {
-    return (
-      navigate('/dashboard', { replace: true })
-      // <div className="container mt-3">
-      //   <p>You are logged in!</p>
-      //   <button type="button" className="btn btn-primary mr-2" onClick={WhoAmI}>
-      //     WhoAmI
-      //   </button>
-      //   <button type="button" className="btn btn-danger" onClick={handleClickLogin}>
-      //     Home
-      //   </button>
-      //   <button type="button" className="btn btn-danger" onClick={handleLogout}>
-      //     Log out
-      //   </button>
-      // </div>
-    );
+    return navigate('/dashboard', { replace: true });
   }
   // if user is not authenticated
   return (
     <>
-      {/* On successful login, shows this */}
-      {success ? (
-        // <div className="container mt-3">
-        //   <p>You are logged in!</p>
-        //   <button type="button" className="btn btn-primary mr-2" onClick={WhoAmI}>
-        //     WhoAmI
-        //   </button>
-        //   <button type="button" className="btn btn-danger" onClick={handleClickLogin}>
-        //     Home
-        //   </button>
-        //   <button type="button" className="btn btn-danger" onClick={handleLogout}>
-        //     Log out
-        //   </button>
-        // </div>
-        navigate('/dashboard', { replace: true })
-      ) : (
-        // Prior to login, shows this
-        <section>
-          <Typography variant="h4" gutterBottom>
-            Sign in to Tripper
-          </Typography>
+      <section>
+        <Typography variant="h4" gutterBottom>
+          Sign in to Tripper
+        </Typography>
 
-          <Typography variant="body2" sx={{ mb: 5 }}>
-            Don’t have an account? {''}
-            <Link component="button" variant="subtitle2" onClick={handleClick}>
-              Get started
+        <Typography variant="body2" sx={{ mb: 5 }}>
+          Don’t have an account? {''}
+          <Link component="button" variant="subtitle2" onClick={handleClick}>
+            Get started
+          </Link>
+        </Typography>
+
+        <form onSubmit={handleLogin}>
+          <Stack spacing={3}>
+            <TextField
+              name="login"
+              label="Username"
+              id="login"
+              defaultValue={login}
+              onChange={(e) => setLogin(e.target.value)}
+            />
+
+            <TextField
+              name="password"
+              label="Password"
+              id="password"
+              defaultValue={password}
+              onChange={(e) => setPassword(e.target.value)}
+              type={showPassword ? 'text' : 'password'}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                      <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Stack>
+          <div>{error && <small className="text-danger">{error}</small>}</div>
+
+          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
+            {/* <Checkbox name="remember" label="Remember me" /> */}
+            <Link variant="subtitle2" underline="hover">
+              Forgot password?
             </Link>
-          </Typography>
+          </Stack>
 
-          <form onSubmit={handleLogin}>
-            <Stack spacing={3}>
-              <TextField
-                name="login"
-                label="Username"
-                id="login"
-                defaultValue={login}
-                onChange={(e) => setLogin(e.target.value)}
-              />
-
-              <TextField
-                name="password"
-                label="Password"
-                id="password"
-                defaultValue={password}
-                onChange={(e) => setPassword(e.target.value)}
-                type={showPassword ? 'text' : 'password'}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                        <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Stack>
-            <div>{error && <small className="text-danger">{error}</small>}</div>
-
-            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
-              {/* <Checkbox name="remember" label="Remember me" /> */}
-              <Link variant="subtitle2" underline="hover">
-                Forgot password?
-              </Link>
-            </Stack>
-
-            {/* <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleClick}> */}
-            {/* <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleClickLogin}> */}
-            <LoadingButton fullWidth size="large" type="submit" variant="contained">
-              Login
-            </LoadingButton>
-          </form>
-        </section>
-      )}
+          {/* <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleClick}> */}
+          {/* <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleClickLogin}> */}
+          <LoadingButton fullWidth size="large" type="submit" variant="contained">
+            Login
+          </LoadingButton>
+        </form>
+      </section>
     </>
   );
 }
