@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { filter, sample } from 'lodash';
 import { sentenceCase } from 'change-case';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import axios from 'axios';
 // @mui
 import {
@@ -37,6 +37,7 @@ import { TRIP_DASHBOARD_URL } from '../sections/auth/api/urls';
 
 const TABLE_HEAD = [
   { id: 'name', label: 'Name', alignRight: false },
+  { id: 'start', label: 'Start', alignRight: false },
   { id: 'destination', label: 'Destination', alignRight: false },
   { id: 'start_date', label: 'Start Date', alignRight: false },
   { id: 'end_date', label: 'End Date', alignRight: false },
@@ -86,6 +87,7 @@ export default function TripsPage() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(null);
   const [trips, setTrips] = useState([]);
+  const [origin, setOrigin, destination, setDestination] = useOutletContext();
 
   const navigate = useNavigate();
 
@@ -113,6 +115,7 @@ export default function TripsPage() {
     uuid: trips[index].uuid,
     avatarUrl: `/assets/images/avatars/avatar_${index + 1}.jpg`,
     name: trips[index].name,
+    start: trips[index].start,
     destination: trips[index].destination,
     start_date: trips[index].start_date,
     end_date: trips[index].end_date,
@@ -142,6 +145,10 @@ export default function TripsPage() {
     // if (e.target.innerText === 'Edit') navigate('/dashboard/trips/edittrip', { replace: true });
   };
 
+  const handleViewTrip = () => {
+    navigate('..', { replace: true });
+  };
+
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -157,7 +164,7 @@ export default function TripsPage() {
     setSelected([]);
   };
 
-  const handleClick = (event, name) => {
+  const handleClick = (event, name, start, destination) => {
     const selectedIndex = selected.indexOf(name);
     let newSelected = [];
     if (selectedIndex === -1) {
@@ -170,6 +177,9 @@ export default function TripsPage() {
       newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
     }
     setSelected(newSelected);
+
+    setOrigin(start);
+    setDestination(destination);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -226,13 +236,16 @@ export default function TripsPage() {
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                     // eslint-disable-next-line camelcase
-                    const { uuid, name, start_date, status, destination, avatarUrl, end_date } = row;
-                    const selectedUser = selected.indexOf(name) !== -1;
+                    const { uuid, name, start_date, status, start, destination, avatarUrl, end_date } = row;
+                    const selectedTrip = selected.indexOf(name) !== -1;
 
                     return (
-                      <TableRow hover key={uuid} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                      <TableRow hover key={uuid} tabIndex={-1} role="checkbox" selected={selectedTrip}>
                         <TableCell padding="checkbox">
-                          <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, name)} />
+                          <Checkbox
+                            checked={selectedTrip}
+                            onChange={(event) => handleClick(event, name, start, destination)}
+                          />
                         </TableCell>
 
                         <TableCell component="th" scope="row" padding="none">
@@ -244,6 +257,7 @@ export default function TripsPage() {
                           </Stack>
                         </TableCell>
 
+                        <TableCell align="left">{start}</TableCell>
                         <TableCell align="left">{destination}</TableCell>
                         {/* eslint-disable-next-line camelcase */}
                         <TableCell align="left">{start_date}</TableCell>
@@ -326,7 +340,7 @@ export default function TripsPage() {
           },
         }}
       >
-        <MenuItem>
+        <MenuItem onClick={handleViewTrip}>
           <Iconify icon={'ic:baseline-remove-red-eye'} sx={{ mr: 2 }} />
           View
         </MenuItem>

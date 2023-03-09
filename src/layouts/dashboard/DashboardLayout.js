@@ -34,6 +34,8 @@ const Main = styled('div')(({ theme }) => ({
 
 export default function DashboardLayout() {
   const [open, setOpen] = useState(false);
+  const [origin, setOrigin] = useState('');
+  const [destination, setDestination] = useState('');
 
   return (
     <StyledRoot>
@@ -42,7 +44,7 @@ export default function DashboardLayout() {
       <Nav openNav={open} onCloseNav={() => setOpen(false)} />
 
       <Main>
-        <Outlet />
+        <Outlet context={[origin, setOrigin, destination, setDestination]} />
       </Main>
     </StyledRoot>
   );

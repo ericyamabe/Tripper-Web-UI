@@ -12,7 +12,6 @@ import {
   DirectionsService,
   DirectionsRenderer,
 } from '@react-google-maps/api';
-// useMemo
 import './map.css';
 
 // ----------------------------------------------------------------------
@@ -25,11 +24,9 @@ AppGoogleMapsAPI.propTypes = {
 const lib = ['places', 'routes'];
 const options = {};
 
-function Map() {
+function Map({origin, destination}) {
   const center = useMemo(() => ({ lat: 34.2407, lng: -118.53 }), []);
   const [searchBox, setSearchBox] = useState(null);
-  const [origin, setOrigin] = useState('');
-  const [destination, setDestination] = useState('');
   const [response, setResponse] = useState(null);
 
   // search box
@@ -57,8 +54,8 @@ function Map() {
   };
 
   const directionsServiceOptions = {
-    destination,
     origin,
+    destination,
     travelMode: 'DRIVING', // default, can change to other modes
   };
 
@@ -103,7 +100,7 @@ function Map() {
   );
 }
 
-function MapComponent() {
+function MapComponent({origin, destination}) {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries: lib,
@@ -111,15 +108,15 @@ function MapComponent() {
 
   if (!isLoaded) return <div>Loading...</div>;
 
-  return <Map />;
+  return <Map origin={origin} destination={destination} />;
 }
 
-export default function AppGoogleMapsAPI({ title, subheader }) {
+export default function AppGoogleMapsAPI({ title, subheader, origin, destination }) {
   return (
     <Card>
       <CardHeader title={title} subheader={subheader} />
       <Box sx={{ mx: 3, my: 3 }} dir="ltr">
-        <MapComponent />
+        <MapComponent origin={origin} destination={destination} />
       </Box>
     </Card>
   );
