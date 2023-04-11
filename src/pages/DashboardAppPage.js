@@ -42,17 +42,9 @@ export default function DashboardAppPage() {
       });
   }, []);
 
-  const handleChange = (e) => {
-    e.preventDefault();
-    setInput(e.target.value);
-  };
-
   const handleClick = () => {
-    console.log(waypoints);
-    console.log(input);
-    // setWaypoints((prevWaypoints) => [
-    //   ...prevWaypoints,
-    setWaypoints(() => [
+    setWaypoints((prevWaypoints) => [
+      ...prevWaypoints,
       {
         location: input,
       }
@@ -112,7 +104,7 @@ export default function DashboardAppPage() {
                   label="Waypoint..."
                   variant="outlined"
                   value={input}
-                  onChange={handleChange}
+                  onChange={(e) => setInput(e.target.value)}
                 />
                 <Button id="waypoint-button" variant="contained" onClick={handleClick}>
                   Add

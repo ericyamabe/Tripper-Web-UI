@@ -32,19 +32,13 @@ const Main = styled('div')(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-const waypointsArray = [
-  {
-    location: "",
-  },
-];
+const waypointsArray = [];
 
 export default function DashboardLayout() {
   const [open, setOpen] = useState(false);
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
   const [waypoints, setWaypoints] = useState(waypointsArray);
-
-
 
   return (
     <StyledRoot>
