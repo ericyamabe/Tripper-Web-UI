@@ -32,10 +32,19 @@ const Main = styled('div')(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
+const waypointsArray = [
+  {
+    location: "",
+  },
+];
+
 export default function DashboardLayout() {
   const [open, setOpen] = useState(false);
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
+  const [waypoints, setWaypoints] = useState(waypointsArray);
+
+
 
   return (
     <StyledRoot>
@@ -44,7 +53,7 @@ export default function DashboardLayout() {
       <Nav openNav={open} onCloseNav={() => setOpen(false)} />
 
       <Main>
-        <Outlet context={[origin, setOrigin, destination, setDestination]} />
+        <Outlet context={[origin, setOrigin, destination, setDestination, waypoints, setWaypoints]} />
       </Main>
     </StyledRoot>
   );

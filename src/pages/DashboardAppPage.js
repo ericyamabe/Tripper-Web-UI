@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async';
 // import { faker } from '@faker-js/faker';
 // // @mui
 // import { useTheme } from '@mui/material/styles';
-import { Grid, Container, Typography } from '@mui/material';
+import { Grid, Container, Typography, TextField, Box, Card, Button } from '@mui/material';
 // // components
 // import Iconify from '../components/iconify';
 // sections
@@ -19,7 +19,8 @@ export default function DashboardAppPage() {
   const [user, setUser] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(null);
-  const [origin, setOrigin, destination, setDestination] = useOutletContext();
+  const [input, setInput] = useState('');
+  const [origin, setOrigin, destination, setDestination, waypoints, setWaypoints] = useOutletContext();
 
   // Uses /api/v1/whoami/ to fetch username from logged in user, defaults guest if not logged in
   useEffect(() => {
@@ -40,6 +41,24 @@ export default function DashboardAppPage() {
         setError(error);
       });
   }, []);
+
+  const handleChange = (e) => {
+    e.preventDefault();
+    setInput(e.target.value);
+  };
+
+  const handleClick = () => {
+    console.log(waypoints);
+    console.log(input);
+    // setWaypoints((prevWaypoints) => [
+    //   ...prevWaypoints,
+    setWaypoints(() => [
+      {
+        location: input,
+      }
+    ])
+    console.log(waypoints);
+  };
 
   return (
     <>
@@ -66,7 +85,40 @@ export default function DashboardAppPage() {
 
         <Grid container spacing={3}>
           <Grid item xs={12} md={12} lg={12}>
-            <AppGoogleMapsAPI title="Tripper Map" subheader="Plan your next trip!" origin={origin} destination={destination} />
+            <AppGoogleMapsAPI
+              title="Tripper Map"
+              subheader="Plan your next trip!"
+              origin={origin}
+              destination={destination}
+              waypoints={waypoints}
+            />
+          </Grid>
+        </Grid>
+        <Grid container spacing={1} sx={{ m: 3 }}>
+          <Grid item xs={9} md={9} lg={9}>
+            <Card sx={{ p: 3 }}>
+              Add waypoint?
+              {/* <TextField id="outlined-basic" label="Enter Waypoint" variant="outlined" /> */}
+              <Box
+                component="form"
+                sx={{
+                  '& > :not(style)': { m: 1, width: '25ch' },
+                }}
+                noValidate
+                autoComplete="off"
+              >
+                <TextField
+                  id="waypoint-text"
+                  label="Waypoint..."
+                  variant="outlined"
+                  value={input}
+                  onChange={handleChange}
+                />
+                <Button id="waypoint-button" variant="contained" onClick={handleClick}>
+                  Add
+                </Button>
+              </Box>
+            </Card>
           </Grid>
         </Grid>
       </Container>

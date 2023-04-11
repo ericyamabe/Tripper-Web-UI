@@ -178,6 +178,9 @@ export default function TripsPage() {
     }
     setSelected(newSelected);
 
+    console.log(start);
+    console.log(destination);
+
     setOrigin(start);
     setDestination(destination);
   };

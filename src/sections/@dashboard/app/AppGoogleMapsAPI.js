@@ -24,7 +24,7 @@ AppGoogleMapsAPI.propTypes = {
 const lib = ['places', 'routes'];
 const options = {};
 
-function Map({origin, destination}) {
+function Map({origin, destination, waypoints}) {
   const center = useMemo(() => ({ lat: 34.2407, lng: -118.53 }), []);
   const [searchBox, setSearchBox] = useState(null);
   const [response, setResponse] = useState(null);
@@ -56,6 +56,7 @@ function Map({origin, destination}) {
   const directionsServiceOptions = {
     origin,
     destination,
+    waypoints,
     travelMode: 'DRIVING', // default, can change to other modes
   };
 
@@ -95,12 +96,12 @@ function Map({origin, destination}) {
         <DirectionsService options={directionsServiceOptions} callback={(e) => directionsCallback(e)} />
       </>
 
-      <MarkerF title={'CSUN'} name={'CSUN'} key={1} position={center} />
+      {/* <MarkerF title={'CSUN'} name={'CSUN'} key={1} position={center} /> */}
     </GoogleMap>
   );
 }
 
-function MapComponent({origin, destination}) {
+function MapComponent({origin, destination, waypoints}) {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries: lib,
@@ -108,15 +109,15 @@ function MapComponent({origin, destination}) {
 
   if (!isLoaded) return <div>Loading...</div>;
 
-  return <Map origin={origin} destination={destination} />;
+  return <Map origin={origin} destination={destination} waypoints={waypoints} />;
 }
 
-export default function AppGoogleMapsAPI({ title, subheader, origin, destination }) {
+export default function AppGoogleMapsAPI({ title, subheader, origin, destination, waypoints }) {
   return (
     <Card>
       <CardHeader title={title} subheader={subheader} />
       <Box sx={{ mx: 3, my: 3 }} dir="ltr">
-        <MapComponent origin={origin} destination={destination} />
+        <MapComponent origin={origin} destination={destination} waypoints={waypoints} />
       </Box>
     </Card>
   );
