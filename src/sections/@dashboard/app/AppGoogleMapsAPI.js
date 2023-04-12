@@ -26,15 +26,15 @@ const options = {};
 
 function Map({origin, destination, waypoints}) {
   const center = useMemo(() => ({ lat: 34.2407, lng: -118.53 }), []);
-  const [searchBox, setSearchBox] = useState(null);
+  // const [searchBox, setSearchBox] = useState(null);
   const [response, setResponse] = useState(null);
 
-  // search box
-  const onPlacesChanged = () => console.log(searchBox.getPlaces());
-  // search box
-  const onSBLoad = (ref) => {
-    setSearchBox(ref);
-  };
+  // // search box
+  // const onPlacesChanged = () => console.log(searchBox.getPlaces());
+  // // search box
+  // const onSBLoad = (ref) => {
+  //   setSearchBox(ref);
+  // };
 
   const count = useRef(0);
 
@@ -63,28 +63,28 @@ function Map({origin, destination, waypoints}) {
   return (
     <GoogleMap zoom={17} center={center} mapContainerStyle={{ width: '100%', height: '60vh' }}>
       <>
-        <StandaloneSearchBox onPlacesChanged={onPlacesChanged} onLoad={onSBLoad}>
-          <input
-            type="text"
-            placeholder="Search with Autocomplete"
-            style={{
-              boxSizing: 'border-box',
-              border: `1px solid transparent`,
-              width: `270px`,
-              height: `40px`,
-              padding: `0 12px`,
-              borderRadius: `3px`,
-              boxShadow: `0 2px 6px rgba(0, 0, 0, 0.3)`,
-              fontSize: `14px`,
-              outline: `none`,
-              margin: 'center',
-              textOverflow: `ellipses`,
-              position: 'absolute',
-              top: '0px',
-              marginLeft: '40%',
-            }}
-          />
-        </StandaloneSearchBox>
+        {/* <StandaloneSearchBox onPlacesChanged={onPlacesChanged} onLoad={onSBLoad}> */}
+        {/*   <input */}
+        {/*     type="text" */}
+        {/*     placeholder="Search with Autocomplete" */}
+        {/*     style={{ */}
+        {/*       boxSizing: 'border-box', */}
+        {/*       border: `1px solid transparent`, */}
+        {/*       width: `270px`, */}
+        {/*       height: `40px`, */}
+        {/*       padding: `0 12px`, */}
+        {/*       borderRadius: `3px`, */}
+        {/*       boxShadow: `0 2px 6px rgba(0, 0, 0, 0.3)`, */}
+        {/*       fontSize: `14px`, */}
+        {/*       outline: `none`, */}
+        {/*       margin: 'center', */}
+        {/*       textOverflow: `ellipses`, */}
+        {/*       position: 'absolute', */}
+        {/*       top: '0px', */}
+        {/*       marginLeft: '40%', */}
+        {/*     }} */}
+        {/*   /> */}
+        {/* </StandaloneSearchBox> */}
         {response !== null && (
           <DirectionsRenderer
             options={{

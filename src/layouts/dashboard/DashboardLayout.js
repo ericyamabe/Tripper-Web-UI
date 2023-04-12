@@ -3,8 +3,10 @@ import { Outlet } from 'react-router-dom';
 // @mui
 import { styled } from '@mui/material/styles';
 //
+import axios from 'axios';
 import Header from './header';
 import Nav from './nav';
+import { WHOAMI_URL } from '../../sections/auth/api/urls';
 
 // ----------------------------------------------------------------------
 
@@ -32,22 +34,59 @@ const Main = styled('div')(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-const waypointsArray = [];
-
 export default function DashboardLayout() {
   const [open, setOpen] = useState(false);
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
-  const [waypoints, setWaypoints] = useState(waypointsArray);
+  const [waypts, setWaypts] = useState([]);
+  const [error, setError] = useState(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [user, setUser] = useState('Guest');
+  const [email, setEmail] = useState('');
+  const [role, setRole] = useState('');
+
+  useEffect(() => {
+    axios
+      .get(WHOAMI_URL, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      })
+      .then((response) => {
+        const data = response.data;
+        if (data.username) setUser(data.username);
+        if (data.email) setEmail(data.email);
+        if (data.role === true) setRole('Admin');
+        if (data.role === false) setRole('Guest');
+        if (!data.role) setRole('');
+        setIsLoaded(true);
+      })
+      .catch((error) => {
+        setIsLoaded(true);
+        setError(error);
+      });
+  }, []);
 
   return (
     <StyledRoot>
-      <Header onOpenNav={() => setOpen(true)} />
+      <Header isLoaded={isLoaded} user={user} email={email} onOpenNav={() => setOpen(true)} />
 
-      <Nav openNav={open} onCloseNav={() => setOpen(false)} />
+      <Nav isLoaded={isLoaded} user={user} role={role} openNav={open} onCloseNav={() => setOpen(false)} />
 
       <Main>
-        <Outlet context={[origin, setOrigin, destination, setDestination, waypoints, setWaypoints]} />
+        <Outlet
+          context={[
+            origin,
+            setOrigin,
+            destination,
+            setDestination,
+            waypts,
+            setWaypts,
+            isLoaded,
+            user,
+          ]}
+        />
       </Main>
     </StyledRoot>
   );

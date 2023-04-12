@@ -116,30 +116,6 @@ export default function LoginForm() {
     }
   };
 
-  // handles logout request through POST to backend, requires CSRF token
-  // axios call won't work for some reason, but fetch does ??
-  // const handleLogout = async (e) => {
-  //   e.preventDefault();
-  //
-  //   await fetch(LOGOUT_URL, {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       'X-CSRFToken': csrfFromCookie,
-  //     },
-  //     credentials: 'include',
-  //   })
-  //     .then(isResponseOk)
-  //     .then((data) => {
-  //       console.log(data);
-  //       setIsAuthenticated(false);
-  //       setSuccess(false);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // };
-
   // if awaiting API response
   if (!isLoaded) {
     return <div>Loading...</div>;

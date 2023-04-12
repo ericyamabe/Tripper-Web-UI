@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 // @mui
 import { alpha } from '@mui/material/styles';
 import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
@@ -43,12 +42,8 @@ const MENU_OPTIONS_GUEST = [
 
 // ----------------------------------------------------------------------
 
-export default function AccountPopover() {
+export default function AccountPopover({ email, user, isLoaded }) {
   const [open, setOpen] = useState(null);
-  const [error, setError] = useState(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [user, setUser] = useState('Guest');
-  const [email, setEmail] = useState('');
 
   const navigate = useNavigate();
 
@@ -64,27 +59,6 @@ export default function AccountPopover() {
     if (e.target.innerText === 'Sign In') navigate('/login', { replace: true });
     setOpen(null);
   };
-
-  // Uses /api/v1/whoami/ to fetch username from logged in user, defaults guest if not logged in
-  useEffect(() => {
-    axios
-      .get(WHOAMI_URL, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true,
-      })
-      .then((response) => {
-        const data = response.data;
-        if (data.username) setUser(data.username);
-        if (data.email) setEmail(data.email);
-        setIsLoaded(true);
-      })
-      .catch((error) => {
-        setIsLoaded(true);
-        setError(error);
-      });
-  }, []);
 
   // checks API response is within acceptable range
   function isResponseOk(response) {

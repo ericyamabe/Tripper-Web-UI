@@ -1,55 +1,28 @@
-import { useState, useEffect } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-// import { faker } from '@faker-js/faker';
 // // @mui
-// import { useTheme } from '@mui/material/styles';
-import { Grid, Container, Typography, TextField, Box, Card, Button } from '@mui/material';
+import { Grid, Container, Typography, TextField, Box, Card, Button, Stack } from '@mui/material';
 // // components
-// import Iconify from '../components/iconify';
 // sections
-import axios from 'axios';
+import { LoadingButton } from '@mui/lab';
 import { AppGoogleMapsAPI } from '../sections/@dashboard/app';
-import { WHOAMI_URL } from '../sections/auth/api/urls';
 
 // ----------------------------------------------------------------------
 
 export default function DashboardAppPage() {
-  // const theme = useTheme();
-  const [user, setUser] = useState('');
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [error, setError] = useState(null);
   const [input, setInput] = useState('');
-  const [origin, setOrigin, destination, setDestination, waypoints, setWaypoints] = useOutletContext();
-
-  // Uses /api/v1/whoami/ to fetch username from logged in user, defaults guest if not logged in
-  useEffect(() => {
-    axios
-      .get(WHOAMI_URL, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true,
-      })
-      .then((response) => {
-        const data = response.data;
-        if (data.username) setUser(data.username);
-        setIsLoaded(true);
-      })
-      .catch((error) => {
-        setIsLoaded(true);
-        setError(error);
-      });
-  }, []);
+  const [origin, setOrigin, destination, setDestination, waypts, setWaypts, isLoaded, user] = useOutletContext();
 
   const handleClick = () => {
-    setWaypoints((prevWaypoints) => [
-      ...prevWaypoints,
+    setWaypts((prevWaypts) => [
+      ...prevWaypts,
       {
-        location: input,
-      }
-    ])
-    console.log(waypoints);
+        location: input.valueOf(),
+      },
+    ]);
+    console.log(waypts);
+    // WAYPOINTS WORK, NEED TO FIGURE OUT HOW TO REFRESH MAP COMPONENT
   };
 
   return (
@@ -82,7 +55,7 @@ export default function DashboardAppPage() {
               subheader="Plan your next trip!"
               origin={origin}
               destination={destination}
-              waypoints={waypoints}
+              waypoints={waypts}
             />
           </Grid>
         </Grid>
@@ -90,26 +63,18 @@ export default function DashboardAppPage() {
           <Grid item xs={9} md={9} lg={9}>
             <Card sx={{ p: 3 }}>
               Add waypoint?
-              {/* <TextField id="outlined-basic" label="Enter Waypoint" variant="outlined" /> */}
-              <Box
-                component="form"
-                sx={{
-                  '& > :not(style)': { m: 1, width: '25ch' },
-                }}
-                noValidate
-                autoComplete="off"
-              >
+              <Stack spacing={3}>
                 <TextField
-                  id="waypoint-text"
-                  label="Waypoint..."
-                  variant="outlined"
-                  value={input}
+                  name="waypoint"
+                  label="Set Waypoint..."
+                  id="waypoint"
+                  defaultValue={input}
                   onChange={(e) => setInput(e.target.value)}
                 />
-                <Button id="waypoint-button" variant="contained" onClick={handleClick}>
-                  Add
-                </Button>
-              </Box>
+              </Stack>
+              <LoadingButton fullWidth size="large" variant="contained" onClick={handleClick}>
+                Add
+              </LoadingButton>
             </Card>
           </Grid>
         </Grid>
