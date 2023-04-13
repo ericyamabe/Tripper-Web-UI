@@ -1,18 +1,17 @@
-import { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-// import ReactApexChart from 'react-apexcharts';
 // @mui
-import { Box, Card, CardHeader } from '@mui/material';
+import { Box, Card, CardHeader, Stack, TextField } from '@mui/material';
 // Google Maps API
 import {
   GoogleMap,
-  MarkerF,
   useLoadScript,
   StandaloneSearchBox,
   DirectionsService,
   DirectionsRenderer,
 } from '@react-google-maps/api';
 import './map.css';
+import { LoadingButton } from '@mui/lab';
 
 // ----------------------------------------------------------------------
 
@@ -24,7 +23,7 @@ AppGoogleMapsAPI.propTypes = {
 const lib = ['places', 'routes'];
 const options = {};
 
-function Map({origin, destination, waypoints}) {
+function Map({ origin, destination, waypoints }) {
   const center = useMemo(() => ({ lat: 34.2407, lng: -118.53 }), []);
   // const [searchBox, setSearchBox] = useState(null);
   const [response, setResponse] = useState(null);
@@ -95,13 +94,11 @@ function Map({origin, destination, waypoints}) {
 
         <DirectionsService options={directionsServiceOptions} callback={(e) => directionsCallback(e)} />
       </>
-
-      {/* <MarkerF title={'CSUN'} name={'CSUN'} key={1} position={center} /> */}
     </GoogleMap>
   );
 }
 
-function MapComponent({origin, destination, waypoints}) {
+function MapComponent({ origin, destination, waypoints, toggleRefresh }) {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries: lib,
@@ -109,15 +106,83 @@ function MapComponent({origin, destination, waypoints}) {
 
   if (!isLoaded) return <div>Loading...</div>;
 
-  return <Map origin={origin} destination={destination} waypoints={waypoints} />;
+  return <Map origin={origin} destination={destination} waypoints={waypoints} key={toggleRefresh} />;
 }
 
-export default function AppGoogleMapsAPI({ title, subheader, origin, destination, waypoints }) {
+export default function AppGoogleMapsAPI({
+  title,
+  subheader,
+  origin,
+  setOrigin,
+  destination,
+  setDestination,
+  waypoints,
+  setWaypts,
+}) {
+  const [input, setInput] = useState('');
+  const [toggleRefresh, setToggleRefresh] = useState(false);
+
+  const handleAddWaypoint = () => {
+    setWaypts((prevWaypts) => [
+      ...prevWaypts,
+      {
+        location: input.valueOf(),
+      },
+    ]);
+    setToggleRefresh((prev) => !prev);
+  };
+
+  const handleRemoveWaypoints = () => {
+    setWaypts([]);
+    setToggleRefresh((prev) => !prev);
+  };
+
+  const handleClearMap = () => {
+    setOrigin('');
+    setDestination('');
+    setWaypts([]);
+    setToggleRefresh((prev) => !prev);
+  };
+
   return (
     <Card>
       <CardHeader title={title} subheader={subheader} />
       <Box sx={{ mx: 3, my: 3 }} dir="ltr">
-        <MapComponent origin={origin} destination={destination} waypoints={waypoints} />
+        <MapComponent origin={origin} destination={destination} waypoints={waypoints} toggleRefresh={toggleRefresh} />
+        {origin === '' ? (
+          ''
+        ) : (
+          <>
+            {/* <Grid container spacing={3} sx={{ m: 3 }}> */}
+            {/*   <Grid item xs={12} md={12} lg={12}> */}
+            <Card sx={{ m: 3, p: 3 }}>
+              Add waypoint?
+              <Stack spacing={3}>
+                <TextField
+                  sx={{ m: 2 }}
+                  name="waypoint"
+                  label="Set Waypoint..."
+                  id="waypoint"
+                  defaultValue={input}
+                  onBlur={(e) => setInput(e.target.value)}
+                />
+              </Stack>
+              <Stack alignItems="center" direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1, sm: 2, md: 4 }}>
+                <LoadingButton sx={{ m: 1, p: 1 }} fullWidth size="large" variant="contained" onClick={handleAddWaypoint}>
+                  Add waypoint
+                </LoadingButton>
+                <LoadingButton sx={{ m: 1, p: 1 }} fullWidth size="large" variant="contained" onClick={handleRemoveWaypoints}>
+                  Remove all waypoints
+                </LoadingButton>
+                <LoadingButton sx={{ m: 1, p: 1 }} fullWidth size="large" variant="contained" onClick={handleClearMap}>
+                  Clear map
+                </LoadingButton>
+              </Stack>
+            </Card>
+            {/*   </Grid> */}
+            {/* </Grid> */}
+          </>
+        )}
       </Box>
     </Card>
   );
