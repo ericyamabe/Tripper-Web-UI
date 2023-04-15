@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 // @mui
 import { alpha } from '@mui/material/styles';
 import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
@@ -21,9 +20,13 @@ const MENU_OPTIONS_USER = [
     icon: 'eva:person-fill',
   },
   {
-    label: 'Settings',
-    icon: 'eva:settings-2-fill',
+    label: 'My Trips',
+    icon: 'eva:person-fill',
   },
+  // {
+  //   label: 'Settings',
+  //   icon: 'eva:settings-2-fill',
+  // },
 ];
 
 const MENU_OPTIONS_GUEST = [
@@ -39,12 +42,8 @@ const MENU_OPTIONS_GUEST = [
 
 // ----------------------------------------------------------------------
 
-export default function AccountPopover() {
+export default function AccountPopover({ email, user, isLoaded }) {
   const [open, setOpen] = useState(null);
-  const [error, setError] = useState(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [user, setUser] = useState('Guest');
-  const [email, setEmail] = useState('');
 
   const navigate = useNavigate();
 
@@ -52,30 +51,14 @@ export default function AccountPopover() {
     setOpen(event.currentTarget);
   };
 
-  const handleClose = () => {
+  const handleClose = (e) => {
+    // console.log(e.target.innerText);
+    if (e.target.innerText === 'Home') navigate('/dashboard/app', { replace: true });
+    if (e.target.innerText === 'Profile') navigate('/dashboard/profile', { replace: true });
+    if (e.target.innerText === 'My Trips') navigate('/dashboard/trips', { replace: true });
+    if (e.target.innerText === 'Sign In') navigate('/login', { replace: true });
     setOpen(null);
   };
-
-  // Uses /api/v1/whoami/ to fetch username from logged in user, defaults guest if not logged in
-  useEffect(() => {
-    axios
-      .get(WHOAMI_URL, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true,
-      })
-      .then((response) => {
-        const data = response.data;
-        if (data.username) setUser(data.username);
-        if (data.email) setEmail(data.email);
-        setIsLoaded(true);
-      })
-      .catch((error) => {
-        setIsLoaded(true);
-        setError(error);
-      });
-  }, []);
 
   // checks API response is within acceptable range
   function isResponseOk(response) {

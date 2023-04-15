@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import axios from 'axios';
+import {useLocation, useOutletContext} from 'react-router-dom';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
 import { Box, Link, Drawer, Typography, Avatar, Stack, Button } from '@mui/material';
@@ -15,8 +14,6 @@ import Scrollbar from '../../../components/scrollbar';
 import NavSection from '../../../components/nav-section';
 //
 import { navConfig1, navConfig2, navConfig3, navConfig4 } from './config';
-import useAuth from '../../../hooks/useAuth';
-import { WHOAMI_URL } from '../../../sections/auth/api/urls';
 
 // ----------------------------------------------------------------------
 
@@ -37,16 +34,8 @@ Nav.propTypes = {
   onCloseNav: PropTypes.func,
 };
 
-export default function Nav({ openNav, onCloseNav }) {
-  const [error, setError] = useState(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [user, setUser] = useState('Guest');
-  const [role, setRole] = useState('');
-
-  // const { isAuthenticated } = useAuth();
-
+export default function Nav({ openNav, onCloseNav, isLoaded, user, role }) {
   const { pathname } = useLocation();
-
   const isDesktop = useResponsive('up', 'lg');
 
   useEffect(() => {
@@ -55,55 +44,6 @@ export default function Nav({ openNav, onCloseNav }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
-
-  // fetches username from logged in user, defaults guest if not logged in
-  // useEffect(() => {
-  //   fetch('http://localhost:8080/api/v1/whoami/', {
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     credentials: 'include',
-  //   })
-  //     .then((res) => res.json())
-  //     .then(
-  //       (data) => {
-  //         setIsLoaded(true);
-  //         if (data.username) setUser(data.username);
-  //         if (data.role === true) setRole('Admin');
-  //         if (data.role === false) setRole('Guest');
-  //         if (!data.role) setRole('');
-  //       },
-  //       // Note: it's important to handle errors here
-  //       // instead of a catch() block so that we don't swallow
-  //       // exceptions from actual bugs in components.
-  //       (error) => {
-  //         setIsLoaded(true);
-  //         setError(error);
-  //       }
-  //     );
-  // }, []);
-
-  useEffect(() => {
-    axios
-      .get(WHOAMI_URL, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true,
-      })
-      .then((response) => {
-        const data = response.data;
-        setIsLoaded(true);
-        if (data.username) setUser(data.username);
-        if (data.role === true) setRole('Admin');
-        if (data.role === false) setRole('Guest');
-        if (!data.role) setRole('');
-      })
-      .catch((error) => {
-        setIsLoaded(true);
-        setError(error);
-      });
-  }, []);
 
   const renderContent = (
     <Scrollbar
@@ -123,12 +63,10 @@ export default function Nav({ openNav, onCloseNav }) {
 
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                {/* {account.displayName} */}
                 {isLoaded ? user : 'Loading...'}
               </Typography>
 
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                {/* {account.role} */}
                 {isLoaded ? role : 'Loading...'}
               </Typography>
             </Box>
@@ -147,13 +85,6 @@ export default function Nav({ openNav, onCloseNav }) {
         </Typography>
       )}
       <Box sx={{ flexGrow: 1 }} />
-      {/* <Box sx={{ px: 2.5, pb: 3, mt: 10 }}> */}
-      {/*   <Stack alignItems="center" spacing={3} sx={{ pt: 5, borderRadius: 2, position: 'relative' }}> */}
-      {/*     <Button href="https://material-ui.com/store/items/minimal-dashboard/" target="_blank" variant="contained"> */}
-      {/*       Upgrade to Pro */}
-      {/*     </Button> */}
-      {/*   </Stack> */}
-      {/* </Box> */}
     </Scrollbar>
   );
 
