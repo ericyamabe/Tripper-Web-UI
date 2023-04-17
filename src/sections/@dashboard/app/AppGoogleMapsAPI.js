@@ -118,6 +118,7 @@ export default function AppGoogleMapsAPI({
   setDestination,
   waypoints,
   setWaypts,
+  setName,
 }) {
   const [input, setInput] = useState('');
   const [toggleRefresh, setToggleRefresh] = useState(false);
@@ -140,6 +141,7 @@ export default function AppGoogleMapsAPI({
   const handleClearMap = () => {
     setOrigin('');
     setDestination('');
+    setName('');
     setWaypts([]);
     setToggleRefresh((prev) => !prev);
   };
@@ -168,10 +170,22 @@ export default function AppGoogleMapsAPI({
                 />
               </Stack>
               <Stack alignItems="center" direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1, sm: 2, md: 4 }}>
-                <LoadingButton sx={{ m: 1, p: 1 }} fullWidth size="large" variant="contained" onClick={handleAddWaypoint}>
+                <LoadingButton
+                  sx={{ m: 1, p: 1 }}
+                  fullWidth
+                  size="large"
+                  variant="contained"
+                  onClick={handleAddWaypoint}
+                >
                   Add waypoint
                 </LoadingButton>
-                <LoadingButton sx={{ m: 1, p: 1 }} fullWidth size="large" variant="contained" onClick={handleRemoveWaypoints}>
+                <LoadingButton
+                  sx={{ m: 1, p: 1 }}
+                  fullWidth
+                  size="large"
+                  variant="contained"
+                  onClick={handleRemoveWaypoints}
+                >
                   Remove all waypoints
                 </LoadingButton>
                 <LoadingButton sx={{ m: 1, p: 1 }} fullWidth size="large" variant="contained" onClick={handleClearMap}>

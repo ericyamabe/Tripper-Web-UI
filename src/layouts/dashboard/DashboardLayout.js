@@ -39,6 +39,10 @@ export default function DashboardLayout() {
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
   const [waypts, setWaypts] = useState([]);
+  const [uuid, setUuid] = useState('');
+  const [name, setName] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [user, setUser] = useState('Guest');
@@ -83,8 +87,18 @@ export default function DashboardLayout() {
             setDestination,
             waypts,
             setWaypts,
+            uuid,
+            setUuid,
+            name,
+            setName,
+            startDate,
+            setStartDate,
+            endDate,
+            setEndDate,
             isLoaded,
+            setIsLoaded,
             user,
+            setUser,
           ]}
         />
       </Main>

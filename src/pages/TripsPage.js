@@ -81,13 +81,41 @@ export default function TripsPage() {
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
   const [selected, setSelected] = useState([]);
+  const [isSelected, setIsSelected] = useState(false);
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [isLoaded, setIsLoaded] = useState(false);
+  // const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(null);
   const [trips, setTrips] = useState([]);
-  const [origin, setOrigin, destination, setDestination] = useOutletContext();
+  // const [disabled, setDisabled] = useState('');
+  const [tempUuid, setTempUuid] = useState('');
+  const [tempName, setTempName] = useState('');
+  const [tempStartDate, setTempStartDate] = useState('');
+  const [tempEndDate, setTempEndDate] = useState('');
+  const [tempOrigin, setTempOrigin] = useState('');
+  const [tempDestination, setTempDestination] = useState('');
+
+  const [
+    origin,
+    setOrigin,
+    destination,
+    setDestination,
+    waypts,
+    setWaypts,
+    uuid,
+    setUuid,
+    name,
+    setName,
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate,
+    isLoaded,
+    setIsLoaded,
+    user,
+    setUser,
+  ] = useOutletContext();
 
   const navigate = useNavigate();
 
@@ -134,18 +162,27 @@ export default function TripsPage() {
     navigate('addtrip', { replace: true });
   };
 
-  const handleDeleteTrip = () => {
-    // delete function not yet added
-  };
+  // const handleDeleteTrip = () => {
+  //   // delete function not yet added
+  // };
 
-  const handleEditTrip = (e) => {
-    // console.log(trips[1].uuid) // need to get array index of selected row
-    // setEditUuid(trips[1]);
-    navigate('editTrip', { replace: true });
-    // if (e.target.innerText === 'Edit') navigate('/dashboard/trips/edittrip', { replace: true });
+  const handleEditTrip = () => {
+    setUuid(tempUuid);
+    setName(tempName);
+    setStartDate(tempStartDate);
+    setEndDate(tempEndDate);
+    setOrigin(tempOrigin);
+    setDestination(tempDestination);
+    navigate('edittrip', { replace: true });
   };
 
   const handleViewTrip = () => {
+    setUuid(tempUuid);
+    setName(tempName);
+    setStartDate(tempStartDate);
+    setEndDate(tempEndDate);
+    setOrigin(tempOrigin);
+    setDestination(tempDestination);
     navigate('..', { replace: true });
   };
 
@@ -164,7 +201,8 @@ export default function TripsPage() {
     setSelected([]);
   };
 
-  const handleClick = (event, name, start, destination) => {
+  // eslint-disable-next-line camelcase
+  const handleClick = (event, uuid, name, start, destination, start_date, end_date) => {
     const selectedIndex = selected.indexOf(name);
     let newSelected = [];
     if (selectedIndex === -1) {
@@ -178,11 +216,24 @@ export default function TripsPage() {
     }
     setSelected(newSelected);
 
+    if (selectedIndex === 0) setIsSelected(false);
+    else setIsSelected(true);
+
+    // attempting to make conditional that sets other checkboxes disabled when one is selected
+    //
+    // if (event.target.checked) {
+    //     setDisabled('disabled');
+    // }
+
     console.log(start);
     console.log(destination);
 
-    setOrigin(start);
-    setDestination(destination);
+    setTempUuid(uuid);
+    setTempName(name);
+    setTempStartDate(start_date);
+    setTempEndDate(end_date);
+    setTempOrigin(start);
+    setTempDestination(destination);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -216,13 +267,23 @@ export default function TripsPage() {
           <Typography variant="h4" gutterBottom>
             Trips
           </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleAddTrip}>
-            Add Trip
-          </Button>
+          {!isSelected ? (
+            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleAddTrip}>
+              Add Trip
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              startIcon={<Iconify icon="ic:baseline-remove-red-eye" />}
+              onClick={handleViewTrip}
+            >
+              View Trip
+            </Button>
+          )}
         </Stack>
 
         <Card>
-          <TripListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
+          <TripListToolbar numSelected={selected.length} filterName={filterName} name={tempName} onFilterName={handleFilterByName} onHandleEditTrip={handleEditTrip} />
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
@@ -247,7 +308,10 @@ export default function TripsPage() {
                         <TableCell padding="checkbox">
                           <Checkbox
                             checked={selectedTrip}
-                            onChange={(event) => handleClick(event, name, start, destination)}
+                            onChange={(event) =>
+                              handleClick(event, uuid, name, start, destination, start_date, end_date)
+                            }
+                            // disabled={disabled}
                           />
                         </TableCell>
 
@@ -272,9 +336,13 @@ export default function TripsPage() {
                         </TableCell>
 
                         <TableCell align="right">
-                          <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
-                            <Iconify icon={'eva:more-vertical-fill'} />
-                          </IconButton>
+                        {/*   {isSelected ? ( */}
+                        {/*     <IconButton size="large" color="inherit" onClick={handleOpenMenu}> */}
+                        {/*       <Iconify icon={'eva:more-vertical-fill'} /> */}
+                        {/*     </IconButton> */}
+                        {/*   ) : ( */}
+                        {/*     '' */}
+                        {/*   )} */}
                         </TableCell>
                       </TableRow>
                     );

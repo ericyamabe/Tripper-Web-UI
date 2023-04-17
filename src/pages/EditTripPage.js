@@ -1,27 +1,41 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useNavigate } from 'react-router-dom';
+import {useNavigate, useOutletContext} from 'react-router-dom';
 // @mui
 import { Box, Button, Card, Container, Grid, Stack, TextField, Typography } from '@mui/material';
-import Iconify from '../components/iconify';
 import axios from '../sections/auth/api/axios';
 import { TRIP_UPDATE_URL } from '../sections/auth/api/urls';
 import GetCookie from '../sections/auth/api/GetCookie';
 /* eslint-disable camelcase */
 
 export default function EditTripPage() {
-  const [name, setName] = useState('');
-  const [start, setStart] = useState('');
-  const [destination, setDestination] = useState('');
-  const [stop_locations, setStop_locations] = useState('');
-  const [stop_criteria, setStop_criteria] = useState('');
-  const [start_date, setStart_date] = useState('');
-  const [end_date, setEnd_date] = useState('');
-  const [notes, setNotes] = useState('');
-  const [emergency_contacts, setEmergency_contacts] = useState('');
-  const [packing_list, setPacking_list] = useState('');
-  const [misc, setMisc] = useState('');
   const [error, setError] = useState('');
+  // const [stop_locations, setStop_locations] = useState('');
+  // const [stop_criteria, setStop_criteria] = useState('');
+  // const [notes, setNotes] = useState('');
+  // const [emergency_contacts, setEmergency_contacts] = useState('');
+  // const [packing_list, setPacking_list] = useState('');
+  // const [misc, setMisc] = useState('');
+  const [
+    origin,
+    setOrigin,
+    destination,
+    setDestination,
+    waypts,
+    setWaypts,
+    uuid,
+    setUuid,
+    name,
+    setName,
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate,
+    isLoaded,
+    setIsLoaded,
+    user,
+    setUser,
+  ] = useOutletContext();
 
   const navigate = useNavigate();
 
@@ -33,11 +47,12 @@ export default function EditTripPage() {
 
     const formData = new FormData();
 
+    formData.append('uuid', uuid);
     formData.append('name', name);
-    formData.append('start', start);
+    formData.append('start', origin);
     formData.append('destination', destination);
-    formData.append('start_date', start_date);
-    formData.append('end_date', end_date);
+    formData.append('start_date', startDate);
+    formData.append('end_date', endDate);
     // formData.append('stop_locations', stop_locations);
     // formData.append('stop_criteria', stop_criteria);
     // formData.append('notes', notes);
@@ -93,9 +108,9 @@ export default function EditTripPage() {
                       id="start"
                       label="Start Location"
                       required
-                      value={start}
+                      value={origin}
                       onChange={(event) => {
-                        setStart(event.target.value);
+                        setOrigin(event.target.value);
                       }}
                     />
                     <TextField
@@ -111,18 +126,18 @@ export default function EditTripPage() {
                       id="start_date"
                       label="Start Date"
                       required
-                      value={start_date}
+                      value={startDate}
                       onChange={(event) => {
-                        setStart_date(event.target.value);
+                        setStartDate(event.target.value);
                       }}
                     />
                     <TextField
                       id="end_date"
                       label="End Date"
                       required
-                      value={end_date}
+                      value={endDate}
                       onChange={(event) => {
-                        setEnd_date(event.target.value);
+                        setEndDate(event.target.value);
                       }}
                     />
                     {/* <TextField */}
@@ -181,7 +196,7 @@ export default function EditTripPage() {
                     {/* /> */}
                     <div>{error && <small className="text-danger">{error}</small>}</div>
                     <Button variant="contained" type="submit">
-                      Edit Trip
+                      Submit Edit
                     </Button>
                   </Stack>
                 </form>

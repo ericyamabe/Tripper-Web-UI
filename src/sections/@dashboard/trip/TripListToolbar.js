@@ -1,7 +1,16 @@
 import PropTypes from 'prop-types';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
-import { Toolbar, Tooltip, IconButton, Typography, OutlinedInput, InputAdornment } from '@mui/material';
+import {
+  Toolbar,
+  Tooltip,
+  IconButton,
+  Typography,
+  OutlinedInput,
+  InputAdornment,
+  MenuItem,
+  Button,
+} from '@mui/material';
 // component
 import Iconify from '../../../components/iconify';
 
@@ -38,7 +47,7 @@ TripListToolbar.propTypes = {
   onFilterName: PropTypes.func,
 };
 
-export default function TripListToolbar({ numSelected, filterName, onFilterName }) {
+export default function TripListToolbar({ numSelected, filterName, onFilterName, name, onHandleEditTrip }) {
   return (
     <StyledRoot
       sx={{
@@ -50,7 +59,8 @@ export default function TripListToolbar({ numSelected, filterName, onFilterName 
     >
       {numSelected > 0 ? (
         <Typography component="div" variant="subtitle1">
-          {numSelected} selected
+          {/* {numSelected} selected */}
+          {name} selected
         </Typography>
       ) : (
         <StyledSearch
@@ -66,17 +76,11 @@ export default function TripListToolbar({ numSelected, filterName, onFilterName 
       )}
 
       {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton>
-            <Iconify icon="eva:trash-2-fill" />
-          </IconButton>
-        </Tooltip>
+        <Button startIcon={<Iconify icon="eva:edit-fill" />} onClick={onHandleEditTrip}>
+          Edit Trip
+        </Button>
       ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <Iconify icon="ic:round-filter-list" />
-          </IconButton>
-        </Tooltip>
+        ''
       )}
     </StyledRoot>
   );

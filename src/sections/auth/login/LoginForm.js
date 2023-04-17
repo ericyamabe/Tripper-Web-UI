@@ -4,7 +4,6 @@ import { IconButton, InputAdornment, Link, Stack, TextField, Typography } from '
 import { useNavigate } from 'react-router-dom';
 import Iconify from '../../../components/iconify';
 import axios from '../api/axios';
-// import WhoAmI from '../api/WhoAmI';
 import GetCookie from '../api/GetCookie';
 import { CSRF_URL, LOGIN_URL, SESSION_URL } from '../api/urls';
 
@@ -29,9 +28,9 @@ export default function LoginForm() {
   };
 
   // Will use for Login button once testing is finished
-  const handleClickLogin = (e) => {
-    navigate('/dashboard', { replace: true });
-  };
+  // const handleClickLogin = (e) => {
+  //   navigate('/dashboard', { replace: true });
+  // };
 
   // runs getSession function persistently on every page load
   useEffect(() => {
@@ -77,12 +76,12 @@ export default function LoginForm() {
   }
 
   // checks API response is within acceptable range
-  function isResponseOk(response) {
-    if (response.status >= 200 && response.status <= 299) {
-      return response.json();
-    }
-    throw Error(response.statusText);
-  }
+  // function isResponseOk(response) {
+  //   if (response.status >= 200 && response.status <= 299) {
+  //     return response.json();
+  //   }
+  //   throw Error(response.statusText);
+  // }
 
   // used to get CSRFToken from current cookie for API calls to verify user.
   const csrfFromCookie = GetCookie('csrftoken');

@@ -47,6 +47,7 @@ export default function TripListHead({
             indeterminate={numSelected > 0 && numSelected < rowCount}
             checked={rowCount > 0 && numSelected === rowCount}
             onChange={onSelectAllClick}
+            disabled
           />
         </TableCell>
         {headLabel.map((headCell) => (
