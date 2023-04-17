@@ -12,9 +12,11 @@ import VerifyEmailPage from './pages/VerifyEmailPage';
 import Landing from './pages/Landing';
 import ProductsPage from './pages/ProductsPage';
 import DashboardAppPage from './pages/DashboardAppPage';
-import RegisterPage from "./pages/RegisterPage";
-import ProfilePage from "./pages/ProfilePage";
-import TripsPage from "./pages/TripsPage";
+import RegisterPage from './pages/RegisterPage';
+import ProfilePage from './pages/ProfilePage';
+import TripsPage from './pages/TripsPage';
+import AddTripPage from './pages/AddTripPage';
+import EditTripPage from "./pages/EditTripPage";
 
 // ----------------------------------------------------------------------
 
@@ -31,6 +33,8 @@ export default function Router() {
         { path: 'blog', element: <BlogPage /> },
         { path: 'profile', element: <ProfilePage /> },
         { path: 'trips', element: <TripsPage /> },
+        { path: 'trips/addtrip', element: <AddTripPage /> },
+        { path: 'trips/edittrip', element: <EditTripPage /> },
       ],
     },
     {
@@ -44,11 +48,11 @@ export default function Router() {
     {
       path: 'VerifyEmailPage',
       element: <VerifyEmailPage />,
-      
     },
-    {      
+    {
       path: 'register',
-      element: <RegisterPage />,},
+      element: <RegisterPage />,
+    },
     {
       element: <SimpleLayout />,
       children: [
