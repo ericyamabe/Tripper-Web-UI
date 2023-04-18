@@ -48,6 +48,7 @@ export default function DashboardLayout() {
   const [user, setUser] = useState('Guest');
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('');
+  const [toggleRefresh, setToggleRefresh] = useState(false);
 
   useEffect(() => {
     axios
@@ -99,6 +100,8 @@ export default function DashboardLayout() {
             setIsLoaded,
             user,
             setUser,
+            toggleRefresh,
+            setToggleRefresh,
           ]}
         />
       </Main>

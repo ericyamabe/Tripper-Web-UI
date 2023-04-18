@@ -2,10 +2,10 @@ import React from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 // // @mui
-import { Grid, Container, Typography } from '@mui/material';
-// // components
+import { Grid, Container, Typography, Card } from '@mui/material';
 // sections
 import { AppGoogleMapsAPI } from '../sections/@dashboard/app';
+import { StopList } from '../sections/@dashboard/trip';
 
 // ----------------------------------------------------------------------
 
@@ -29,6 +29,8 @@ export default function DashboardAppPage() {
     setIsLoaded,
     user,
     setUser,
+    toggleRefresh,
+    setToggleRefresh,
   ] = useOutletContext();
 
   return (
@@ -57,17 +59,18 @@ export default function DashboardAppPage() {
         <Grid container spacing={3}>
           <Grid item xs={12} md={12} lg={12}>
             <AppGoogleMapsAPI
-              title={name !== '' ? (name) : ('Tripper Map')}
-              subheader={name !== '' ? (`${startDate} to ${endDate}`) : ('Plan your next trip!')}
+              title={name !== '' ? name : 'Tripper Map'}
+              subheader={name !== '' ? `${startDate} to ${endDate}` : 'Plan your next trip!'}
               origin={origin}
-              setOrigin={setOrigin}
               destination={destination}
-              setDestination={setDestination}
               waypoints={waypts}
-              setWaypts={setWaypts}
-              setName={setName}
+              toggleRefresh={toggleRefresh}
             />
-
+            {origin !== '' && (
+              <Card sx={{ m: 3, p: 3 }}>
+                <StopList setToggleRefresh={setToggleRefresh} setWaypts={setWaypts} setOrigin={setOrigin} setDestination={setDestination} setName={setName} />
+              </Card>
+            )}
           </Grid>
         </Grid>
       </Container>
