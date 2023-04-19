@@ -3,6 +3,7 @@ import { Button, Stack, TextField } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 
 function InitializeTextfield({ value, onChange, onRemove }) {
+
   return (
     <Stack alignItems="center" sx={{ m: 1 }} direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1, sm: 2, md: 4 }}>
       <TextField
@@ -22,7 +23,7 @@ function InitializeTextfield({ value, onChange, onRemove }) {
   );
 }
 
-export default function StopList({ setToggleRefresh, setWaypts, setOrigin, setDestination, setName }) {
+export default function StopList({ setToggleRefresh, waypoints, setWaypts, setOrigin, setDestination, setName }) {
   const [fields, setFields] = useState([]);
 
   const handleAddField = () => {
@@ -40,21 +41,31 @@ export default function StopList({ setToggleRefresh, setWaypts, setOrigin, setDe
   const handleRemove = (index) => {
     const newFields = [...fields];
     newFields.splice(index, 1);
+
+    const nonEmptyFields = newFields.filter((field) => field !== '');
     setFields(newFields);
-    const formattedFields = newFields.map((field) => ({ location: field }));
-    setWaypts(formattedFields);
+
+    if (nonEmptyFields.length === 0) {
+      setWaypts([]);
+    } else {
+      const formattedFields = nonEmptyFields.map((field) => ({ location: field }));
+      setWaypts(formattedFields);
+    }
+
     setToggleRefresh((prev) => !prev);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const formattedFields = fields.map((field) => ({ location: field }));
+    const filteredFields = fields.filter((field) => field !== '');
+    const formattedFields = filteredFields.map((field) => ({ location: field }));
     setWaypts(formattedFields);
     setToggleRefresh((prev) => !prev);
   };
 
   const handleRemoveWaypoints = () => {
     setWaypts([]);
+    setFields([]);
     setToggleRefresh((prev) => !prev);
   };
 
@@ -70,7 +81,7 @@ export default function StopList({ setToggleRefresh, setWaypts, setOrigin, setDe
     <form onSubmit={handleSubmit}>
       <Stack alignItems="center" direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1, sm: 2, md: 4 }}>
         <LoadingButton
-            sx={{ m: 1, p: 1 }}
+            sx={{ my: 1, p: 1 }}
             fullWidth
             size="large"
             variant="contained"
@@ -79,7 +90,7 @@ export default function StopList({ setToggleRefresh, setWaypts, setOrigin, setDe
           Remove all waypoints
         </LoadingButton>
         <LoadingButton
-            sx={{ m: 1, p: 1 }}
+            sx={{ my: 1, p: 1 }}
             fullWidth
             size="large"
             variant="contained"
@@ -89,7 +100,7 @@ export default function StopList({ setToggleRefresh, setWaypts, setOrigin, setDe
         </LoadingButton>
       </Stack>
       <LoadingButton
-        sx={{ m: 1, p: 1 }}
+        sx={{ my: 1, p: 1 }}
         fullWidth
         size="large"
         variant="contained"

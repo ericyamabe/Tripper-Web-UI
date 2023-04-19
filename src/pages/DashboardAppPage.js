@@ -1,9 +1,10 @@
 import React from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 // // @mui
-import { Grid, Container, Typography, Card } from '@mui/material';
+import { Grid, Container, Typography, Card, Stack } from '@mui/material';
 // sections
+import { LoadingButton } from '@mui/lab';
 import { AppGoogleMapsAPI } from '../sections/@dashboard/app';
 import { StopList } from '../sections/@dashboard/trip';
 
@@ -33,6 +34,8 @@ export default function DashboardAppPage() {
     setToggleRefresh,
   ] = useOutletContext();
 
+  const navigate = useNavigate();
+
   return (
     <>
       <Helmet>
@@ -56,7 +59,7 @@ export default function DashboardAppPage() {
           </>
         )}
 
-        <Grid container spacing={3}>
+        <Grid container spacing={3} justifyContent="center">
           <Grid item xs={12} md={12} lg={12}>
             <AppGoogleMapsAPI
               title={name !== '' ? name : 'Tripper Map'}
@@ -66,11 +69,41 @@ export default function DashboardAppPage() {
               waypoints={waypts}
               toggleRefresh={toggleRefresh}
             />
-            {origin !== '' && (
-              <Card sx={{ m: 3, p: 3 }}>
-                <StopList setToggleRefresh={setToggleRefresh} setWaypts={setWaypts} setOrigin={setOrigin} setDestination={setDestination} setName={setName} />
+            <Grid container item xs={12} justifyContent="center">
+              <Card sx={{ mt: 3, p: 3, width: 0.75 }}>
+                {origin !== '' ? (
+                  <StopList
+                    setToggleRefresh={setToggleRefresh}
+                    waypoints={waypts}
+                    setWaypts={setWaypts}
+                    setOrigin={setOrigin}
+                    setDestination={setDestination}
+                    setName={setName}
+                  />
+                ) : (
+                  <Stack alignItems="center" direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1, sm: 2, md: 4 }}>
+                    <LoadingButton
+                      sx={{ m: 1, p: 1 }}
+                      fullWidth
+                      size="large"
+                      variant="contained"
+                      onClick={() => navigate('/dashboard/profile', { replace: true })}
+                    >
+                      View Profile
+                    </LoadingButton>
+                    <LoadingButton
+                      sx={{ m: 1, p: 1 }}
+                      fullWidth
+                      size="large"
+                      variant="contained"
+                      onClick={() => navigate('/dashboard/trips', { replace: true })}
+                    >
+                      View Trips
+                    </LoadingButton>
+                  </Stack>
+                )}
               </Card>
-            )}
+            </Grid>
           </Grid>
         </Grid>
       </Container>
