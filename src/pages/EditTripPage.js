@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import {useNavigate, useOutletContext} from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 // @mui
 import { Box, Button, Card, Container, Grid, Stack, TextField, Typography } from '@mui/material';
 import axios from '../sections/auth/api/axios';
 import { TRIP_UPDATE_URL } from '../sections/auth/api/urls';
 import GetCookie from '../sections/auth/api/GetCookie';
+import Iconify from '../components/iconify';
 /* eslint-disable camelcase */
 
 export default function EditTripPage() {
@@ -41,6 +42,17 @@ export default function EditTripPage() {
 
   // used to get CSRFToken from current cookie for API calls to verify user.
   const csrfFromCookie = GetCookie('csrftoken');
+
+  const handleCancel = () => {
+    setOrigin('');
+    setDestination('');
+    setWaypts([]);
+    setUuid('');
+    setName('');
+    setStartDate('');
+    setEndDate('');
+  navigate('/dashboard/trips', { replace: true })
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -195,9 +207,26 @@ export default function EditTripPage() {
                     {/*   }} */}
                     {/* /> */}
                     <div>{error && <small className="text-danger">{error}</small>}</div>
-                    <Button variant="contained" type="submit">
-                      Submit Edit
-                    </Button>
+                    <Grid container item xs={12} justifyContent="center">
+                      <Stack
+                        alignItems="center"
+                        sx={{ width: 0.75 }}
+                        direction={{ xs: 'column', sm: 'row' }}
+                        spacing={{ xs: 1, sm: 2, md: 4 }}
+                      >
+                        <Button variant="contained" type="submit" fullWidth startIcon={<Iconify icon="eva:checkmark-fill" />}>
+                          Submit Edit
+                        </Button>
+                        <Button
+                          variant="contained"
+                          fullWidth
+                          startIcon={<Iconify icon="eva:close-fill" />}
+                          onClick={handleCancel}
+                        >
+                          Cancel
+                        </Button>
+                      </Stack>
+                    </Grid>
                   </Stack>
                 </form>
               </Box>

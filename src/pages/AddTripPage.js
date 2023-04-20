@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 // @mui
 import { Box, Button, Card, Container, Grid, Stack, TextField, Typography } from '@mui/material';
 import Iconify from '../components/iconify';
@@ -13,14 +13,9 @@ export default function AddTripPage() {
   const [name, setName] = useState('');
   const [start, setStart] = useState('');
   const [destination, setDestination] = useState('');
-  const [stop_locations, setStop_locations] = useState('');
-  const [stop_criteria, setStop_criteria] = useState('');
+  const [stop_locations, setStop_locations] = useState([]);
   const [start_date, setStart_date] = useState('');
   const [end_date, setEnd_date] = useState('');
-  const [notes, setNotes] = useState('');
-  const [emergency_contacts, setEmergency_contacts] = useState('');
-  const [packing_list, setPacking_list] = useState('');
-  const [misc, setMisc] = useState('');
   const [error, setError] = useState('');
 
   const navigate = useNavigate();
@@ -38,12 +33,13 @@ export default function AddTripPage() {
     formData.append('destination', destination);
     formData.append('start_date', start_date);
     formData.append('end_date', end_date);
-    // formData.append('stop_locations', stop_locations);
-    // formData.append('stop_criteria', stop_criteria);
-    // formData.append('notes', notes);
-    // formData.append('emergency_contacts', emergency_contacts);
-    // formData.append('packing_list', packing_list);
-    // formData.append('misc', misc);
+    const stopLocationsArray = stop_locations.map((location) => ({ location }));
+    formData.append('stop_locations', JSON.stringify(stopLocationsArray));
+
+    console.log('Form Data:');
+    Array.from(formData.entries()).forEach(([key, value]) => {
+      console.log(`${key}: ${value}`);
+    });
 
     try {
       const response = await axios.post(TRIP_CREATE_URL, formData, {
@@ -77,7 +73,7 @@ export default function AddTripPage() {
         <Card>
           <Grid container alignItems="center" justifyContent="center" spacing={3}>
             <Grid item xs={12} md={6} lg={8}>
-              <Box py={5} >
+              <Box py={5}>
                 <form onSubmit={handleSubmit}>
                   <Stack spacing={2}>
                     <TextField
@@ -107,6 +103,57 @@ export default function AddTripPage() {
                         setDestination(event.target.value);
                       }}
                     />
+                    <Grid container alignItems="center" justifyContent="space-between">
+                      <Grid item xs={6}>
+                        <Box display="flex" sx={{ pl: 1 }} alignItems="center">
+                          <Typography>Add stops?</Typography>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Box display="flex" alignItems="center" sx={{ pr: 1 }} justifyContent="flex-end">
+                          <Button
+                            variant="contained"
+                            onClick={() => {
+                              if (stop_locations.length < 10) {
+                                const newLocations = [...stop_locations, ''];
+                                setStop_locations(newLocations);
+                              }
+                            }}
+                          >
+                            +
+                          </Button>
+                        </Box>
+                      </Grid>
+                    </Grid>
+                    {stop_locations.map((location, index) => (
+                      <Box key={index} display="flex" alignItems="center">
+                        <TextField
+                          value={location}
+                          label="Add Stop..."
+                          fullWidth
+                          required
+                          sx={{ pr: 2 }}
+                          onChange={(event) => {
+                            const newLocations = [...stop_locations];
+                            newLocations[index] = event.target.value;
+                            setStop_locations(newLocations);
+                            console.log(stop_locations);
+                          }}
+                        />
+                        <Button
+                          variant="outlined"
+                          sx={{mr: 1}}
+                          onClick={() => {
+                            const newLocations = [...stop_locations];
+                            newLocations.splice(index, 1);
+                            setStop_locations(newLocations);
+                          }}
+                        >
+                          Remove
+                        </Button>
+                      </Box>
+                    ))}
+                    {/* <AddPageStopList tempStop_locations={tempStop_locations} setTempStop_locations={setTempStop_locations} /> */}
                     <TextField
                       id="start_date"
                       label="Start Date"
@@ -125,64 +172,34 @@ export default function AddTripPage() {
                         setEnd_date(event.target.value);
                       }}
                     />
-                    {/* <TextField */}
-                    {/*   id="stop_locations" */}
-                    {/*   label="Stop Locations" */}
-                    {/*   disabled */}
-                    {/*   value={stop_locations} */}
-                    {/*   onChange={(event) => { */}
-                    {/*     setStop_locations(event.target.value); */}
-                    {/*   }} */}
-                    {/* /> */}
-                    {/* <TextField */}
-                    {/*   id="stop_criteria" */}
-                    {/*   label="Stop Criteria" */}
-                    {/*   disabled */}
-                    {/*   value={stop_criteria} */}
-                    {/*   onChange={(event) => { */}
-                    {/*     setStop_criteria(event.target.value); */}
-                    {/*   }} */}
-                    {/* /> */}
-                    {/* <TextField */}
-                    {/*   id="notes" */}
-                    {/*   label="Notes" */}
-                    {/*   disabled */}
-                    {/*   value={notes} */}
-                    {/*   onChange={(event) => { */}
-                    {/*     setNotes(event.target.value); */}
-                    {/*   }} */}
-                    {/* /> */}
-                    {/* <TextField */}
-                    {/*   id="emergency_contacts" */}
-                    {/*   label="Emergency Contacts" */}
-                    {/*   disabled */}
-                    {/*   value={emergency_contacts} */}
-                    {/*   onChange={(event) => { */}
-                    {/*     setEmergency_contacts(event.target.value); */}
-                    {/*   }} */}
-                    {/* /> */}
-                    {/* <TextField */}
-                    {/*   id="packing_list" */}
-                    {/*   label="Packing List" */}
-                    {/*   disabled */}
-                    {/*   value={packing_list} */}
-                    {/*   onChange={(event) => { */}
-                    {/*     setPacking_list(event.target.value); */}
-                    {/*   }} */}
-                    {/* /> */}
-                    {/* <TextField */}
-                    {/*   id="misc" */}
-                    {/*   label="Miscellaneous" */}
-                    {/*   disabled */}
-                    {/*   value={misc} */}
-                    {/*   onChange={(event) => { */}
-                    {/*     setMisc(event.target.value); */}
-                    {/*   }} */}
-                    {/* /> */}
                     <div>{error && <small className="text-danger">{error}</small>}</div>
-                    <Button variant="contained" type="submit" startIcon={<Iconify icon="eva:plus-fill" />}>
-                      Add Trip
-                    </Button>
+                    <Grid container item xs={12} justifyContent="center">
+                      <Stack
+                        alignItems="center"
+                        sx={{ width: 0.75 }}
+                        direction={{ xs: 'column', sm: 'row' }}
+                        spacing={{ xs: 1, sm: 2, md: 4 }}
+                      >
+                        <Button
+                          variant="contained"
+                          size="large"
+                          type="submit"
+                          fullWidth
+                          startIcon={<Iconify icon="eva:plus-fill" />}
+                        >
+                          Add Trip
+                        </Button>
+                        <Button
+                          variant="contained"
+                          size="large"
+                          fullWidth
+                          startIcon={<Iconify icon="eva:close-fill" />}
+                          onClick={() => navigate('/dashboard/trips', { replace: true })}
+                        >
+                          Cancel
+                        </Button>
+                      </Stack>
+                    </Grid>
                   </Stack>
                 </form>
               </Box>

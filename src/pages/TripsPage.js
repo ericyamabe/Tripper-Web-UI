@@ -268,12 +268,18 @@ export default function TripsPage() {
             Trips
           </Typography>
           {!isSelected ? (
-            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleAddTrip}>
+            <Button
+              variant="contained"
+              startIcon={<Iconify icon="eva:plus-fill" />}
+              onClick={handleAddTrip}
+            >
               Add Trip
             </Button>
           ) : (
             <Button
               variant="contained"
+              size="large"
+              color="secondary"
               startIcon={<Iconify icon="ic:baseline-remove-red-eye" />}
               onClick={handleViewTrip}
             >
@@ -283,7 +289,13 @@ export default function TripsPage() {
         </Stack>
 
         <Card>
-          <TripListToolbar numSelected={selected.length} filterName={filterName} name={tempName} onFilterName={handleFilterByName} onHandleEditTrip={handleEditTrip} />
+          <TripListToolbar
+            numSelected={selected.length}
+            filterName={filterName}
+            name={tempName}
+            onFilterName={handleFilterByName}
+            onHandleEditTrip={handleEditTrip}
+          />
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
@@ -336,13 +348,13 @@ export default function TripsPage() {
                         </TableCell>
 
                         <TableCell align="right">
-                        {/*   {isSelected ? ( */}
-                        {/*     <IconButton size="large" color="inherit" onClick={handleOpenMenu}> */}
-                        {/*       <Iconify icon={'eva:more-vertical-fill'} /> */}
-                        {/*     </IconButton> */}
-                        {/*   ) : ( */}
-                        {/*     '' */}
-                        {/*   )} */}
+                          {/*   {isSelected ? ( */}
+                          {/*     <IconButton size="large" color="inherit" onClick={handleOpenMenu}> */}
+                          {/*       <Iconify icon={'eva:more-vertical-fill'} /> */}
+                          {/*     </IconButton> */}
+                          {/*   ) : ( */}
+                          {/*     '' */}
+                          {/*   )} */}
                         </TableCell>
                       </TableRow>
                     );

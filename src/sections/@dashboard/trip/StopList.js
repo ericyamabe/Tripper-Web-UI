@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Button, Stack, TextField } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
+import Iconify from '../../../components/iconify';
 
 function InitializeTextfield({ value, onChange, onRemove }) {
-
   return (
     <Stack alignItems="center" sx={{ m: 1 }} direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1, sm: 2, md: 4 }}>
       <TextField
@@ -16,9 +16,11 @@ function InitializeTextfield({ value, onChange, onRemove }) {
         value={value}
         onChange={onChange}
       />
-      <Button sx={{ p: 1 }} variant="outlined" onClick={onRemove}>
-        Remove
-      </Button>
+      <Stack alignItems="center" direction={{ xs: 'row', sm: 'row' }}>
+        <Button sx={{}} variant="outlined" startIcon={<Iconify icon="eva:minus-fill" />} onClick={onRemove}>
+          Remove
+        </Button>
+      </Stack>
     </Stack>
   );
 }
@@ -81,20 +83,22 @@ export default function StopList({ setToggleRefresh, waypoints, setWaypts, setOr
     <form onSubmit={handleSubmit}>
       <Stack alignItems="center" direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1, sm: 2, md: 4 }}>
         <LoadingButton
-            sx={{ my: 1, p: 1 }}
-            fullWidth
-            size="large"
-            variant="contained"
-            onClick={handleRemoveWaypoints}
+          sx={{ my: 1, p: 1 }}
+          fullWidth
+          size="large"
+          variant="contained"
+          startIcon={<Iconify icon="eva:minus-fill" />}
+          onClick={handleRemoveWaypoints}
         >
-          Remove all waypoints
+          Remove all stops
         </LoadingButton>
         <LoadingButton
-            sx={{ my: 1, p: 1 }}
-            fullWidth
-            size="large"
-            variant="contained"
-            onClick={handleClearMap}
+          sx={{ my: 1, p: 1 }}
+          fullWidth
+          size="large"
+          variant="contained"
+          startIcon={<Iconify icon="eva:close-fill" />}
+          onClick={handleClearMap}
         >
           Clear map
         </LoadingButton>
@@ -105,6 +109,7 @@ export default function StopList({ setToggleRefresh, waypoints, setWaypts, setOr
         size="large"
         variant="contained"
         type="button"
+        startIcon={<Iconify icon="eva:plus-fill" />}
         onClick={handleAddField}
       >
         {fields.length === 0 && 'Add a Stop'}
@@ -127,6 +132,7 @@ export default function StopList({ setToggleRefresh, waypoints, setWaypts, setOr
             size="large"
             variant="contained"
             type="submit"
+            startIcon={<Iconify icon="eva:checkmark-fill" />}
             onClick={handleSubmit}
           >
             Submit
