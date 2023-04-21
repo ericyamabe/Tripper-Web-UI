@@ -14,8 +14,8 @@ export default function AddTripPage() {
   const [start, setStart] = useState('');
   const [destination, setDestination] = useState('');
   const [stop_locations, setStop_locations] = useState([]);
-  const [start_date, setStart_date] = useState('');
-  const [end_date, setEnd_date] = useState('');
+  const [start_date, setStart_date] = useState(new Date().toISOString().substr(0, 10));
+  const [end_date, setEnd_date] = useState(new Date().toISOString().substr(0, 10));
   const [error, setError] = useState('');
 
   const navigate = useNavigate();
@@ -33,8 +33,13 @@ export default function AddTripPage() {
     formData.append('destination', destination);
     formData.append('start_date', start_date);
     formData.append('end_date', end_date);
-    const stopLocationsArray = stop_locations.map((location) => ({ location }));
-    formData.append('stop_locations', JSON.stringify(stopLocationsArray));
+    console.log(stop_locations)
+    // const stopLocationsArray = stop_locations.map((location) => ({ location }));
+    // formData.append('stop_locations', JSON.stringify(stopLocationsArray));
+    const stopLocationsString = stop_locations.map(location => `{"location":"${location}"}`).join(',');
+    formData.append('stop_locations', stopLocationsString);
+
+    formData.append('stop_criteria', '{}');
 
     console.log('Form Data:');
     Array.from(formData.entries()).forEach(([key, value]) => {

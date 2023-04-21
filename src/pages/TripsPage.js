@@ -20,18 +20,17 @@ import {
   TableCell,
   Container,
   Typography,
-  IconButton,
   TableContainer,
   TablePagination,
 } from '@mui/material';
 // components
-// import { faker } from '@faker-js/faker';
 import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
 import { TripListHead, TripListToolbar } from '../sections/@dashboard/trip';
 import { TRIP_DASHBOARD_URL } from '../sections/auth/api/urls';
+/* eslint-disable camelcase */
 
 // ----------------------------------------------------------------------
 
@@ -95,6 +94,7 @@ export default function TripsPage() {
   const [tempEndDate, setTempEndDate] = useState('');
   const [tempOrigin, setTempOrigin] = useState('');
   const [tempDestination, setTempDestination] = useState('');
+  const [tempStopLocations, setTempStopLocations] = useState([]);
 
   const [
     origin,
@@ -147,12 +147,14 @@ export default function TripsPage() {
     destination: trips[index].destination,
     start_date: trips[index].start_date,
     end_date: trips[index].end_date,
+    stop_locations: trips[index].stop_locations,
+    // stop_criteria: trips[index].stop_criteria,
     status: sample(['complete', 'planned']), // lodash fake data
   }));
 
-  const handleOpenMenu = (event) => {
-    setOpen(event.currentTarget);
-  };
+  // const handleOpenMenu = (event) => {
+  //   setOpen(event.currentTarget);
+  // };
 
   const handleCloseMenu = () => {
     setOpen(null);
@@ -183,6 +185,11 @@ export default function TripsPage() {
     setEndDate(tempEndDate);
     setOrigin(tempOrigin);
     setDestination(tempDestination);
+    setWaypts([])
+    if (tempStopLocations.some(obj => Object.keys(obj).length !== 0)) {
+      console.log('test');
+      setWaypts(tempStopLocations);
+    }
     navigate('..', { replace: true });
   };
 
@@ -201,8 +208,7 @@ export default function TripsPage() {
     setSelected([]);
   };
 
-  // eslint-disable-next-line camelcase
-  const handleClick = (event, uuid, name, start, destination, start_date, end_date) => {
+  const handleClick = (event, uuid, name, start, destination, start_date, end_date, stop_locations) => {
     const selectedIndex = selected.indexOf(name);
     let newSelected = [];
     if (selectedIndex === -1) {
@@ -219,14 +225,8 @@ export default function TripsPage() {
     if (selectedIndex === 0) setIsSelected(false);
     else setIsSelected(true);
 
-    // attempting to make conditional that sets other checkboxes disabled when one is selected
-    //
-    // if (event.target.checked) {
-    //     setDisabled('disabled');
-    // }
-
-    console.log(start);
-    console.log(destination);
+    // console.log(start);
+    // console.log(destination);
 
     setTempUuid(uuid);
     setTempName(name);
@@ -234,6 +234,7 @@ export default function TripsPage() {
     setTempEndDate(end_date);
     setTempOrigin(start);
     setTempDestination(destination);
+    setTempStopLocations([stop_locations]);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -312,8 +313,9 @@ export default function TripsPage() {
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                     // eslint-disable-next-line camelcase
-                    const { uuid, name, start_date, status, start, destination, avatarUrl, end_date } = row;
+                    const { uuid, name, start_date, status, start, destination, avatarUrl, end_date, stop_locations } = row;
                     const selectedTrip = selected.indexOf(name) !== -1;
+                    const disabled = selected.length > 0 && !selectedTrip; // Add this line
 
                     return (
                       <TableRow hover key={uuid} tabIndex={-1} role="checkbox" selected={selectedTrip}>
@@ -321,9 +323,9 @@ export default function TripsPage() {
                           <Checkbox
                             checked={selectedTrip}
                             onChange={(event) =>
-                              handleClick(event, uuid, name, start, destination, start_date, end_date)
+                              handleClick(event, uuid, name, start, destination, start_date, end_date, stop_locations)
                             }
-                            // disabled={disabled}
+                            disabled={disabled}
                           />
                         </TableCell>
 

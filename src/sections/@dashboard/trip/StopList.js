@@ -62,6 +62,7 @@ export default function StopList({ setToggleRefresh, waypoints, setWaypts, setOr
     const filteredFields = fields.filter((field) => field !== '');
     const formattedFields = filteredFields.map((field) => ({ location: field }));
     setWaypts(formattedFields);
+    console.log(formattedFields)
     setToggleRefresh((prev) => !prev);
   };
 
