@@ -41,7 +41,6 @@ const TABLE_HEAD = [
   { id: 'start_date', label: 'Start Date', alignRight: false },
   { id: 'end_date', label: 'End Date', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
-  { id: '' },
 ];
 
 // ----------------------------------------------------------------------
@@ -84,10 +83,8 @@ export default function TripsPage() {
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  // const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(null);
   const [trips, setTrips] = useState([]);
-  // const [disabled, setDisabled] = useState('');
   const [tempUuid, setTempUuid] = useState('');
   const [tempName, setTempName] = useState('');
   const [tempStartDate, setTempStartDate] = useState('');
@@ -113,14 +110,16 @@ export default function TripsPage() {
     setEndDate,
     isLoaded,
     setIsLoaded,
-    user,
-    setUser,
   ] = useOutletContext();
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchTrips();
+    fetchTrips().catch((err) => {
+      setError(true);
+      console.log(err);
+      console.log(error);
+    });
   }, []);
 
   async function fetchTrips() {
@@ -129,13 +128,9 @@ export default function TripsPage() {
         withCredentials: true,
       });
       setTrips(res.data);
-      console.log(trips);
       setIsLoaded(true);
     } catch (err) {
-      setError(true);
-      console.log(err);
-      console.log(error);
-      setIsLoaded(true);
+      throw new Error(err);
     }
   }
 
@@ -152,10 +147,6 @@ export default function TripsPage() {
     status: sample(['complete', 'planned']), // lodash fake data
   }));
 
-  // const handleOpenMenu = (event) => {
-  //   setOpen(event.currentTarget);
-  // };
-
   const handleCloseMenu = () => {
     setOpen(null);
   };
@@ -163,10 +154,6 @@ export default function TripsPage() {
   const handleAddTrip = () => {
     navigate('addtrip', { replace: true });
   };
-
-  // const handleDeleteTrip = () => {
-  //   // delete function not yet added
-  // };
 
   const handleEditTrip = () => {
     setUuid(tempUuid);
@@ -224,9 +211,6 @@ export default function TripsPage() {
     if (selectedIndex === 0) setIsSelected(false);
     else setIsSelected(true);
 
-    // console.log(start);
-    // console.log(destination);
-
     setTempUuid(uuid);
     setTempName(name);
     setTempStartDate(start_date);
@@ -251,9 +235,7 @@ export default function TripsPage() {
   };
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - TRIPSLIST.length) : 0;
-
   const filteredUsers = applySortFilter(TRIPSLIST, getComparator(order, orderBy), filterName);
-
   const isNotFound = !filteredUsers.length && !!filterName;
 
   return (
@@ -340,22 +322,12 @@ export default function TripsPage() {
                         <TableCell align="left">{start}</TableCell>
                         <TableCell align="left">{destination}</TableCell>
                         {/* eslint-disable-next-line camelcase */}
-                        <TableCell align="left">{start_date}</TableCell>
+                        <TableCell align="left" style={{ minWidth: 115 }}>{start_date}</TableCell>
                         {/* eslint-disable-next-line camelcase */}
-                        <TableCell align="left">{end_date}</TableCell>
+                        <TableCell align="left" style={{ minWidth: 115 }}>{end_date}</TableCell>
 
                         <TableCell align="left">
                           <Label color={(status === 'planned' && 'warning') || 'success'}>{sentenceCase(status)}</Label>
-                        </TableCell>
-
-                        <TableCell align="right">
-                          {/*   {isSelected ? ( */}
-                          {/*     <IconButton size="large" color="inherit" onClick={handleOpenMenu}> */}
-                          {/*       <Iconify icon={'eva:more-vertical-fill'} /> */}
-                          {/*     </IconButton> */}
-                          {/*   ) : ( */}
-                          {/*     '' */}
-                          {/*   )} */}
                         </TableCell>
                       </TableRow>
                     );

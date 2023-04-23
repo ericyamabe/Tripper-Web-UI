@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 // @mui
-import { Box, Card, CardHeader } from '@mui/material';
+import { Box, Card, CardHeader, Typography } from '@mui/material';
 // Google Maps API
 import { GoogleMap, useLoadScript, DirectionsService, DirectionsRenderer } from '@react-google-maps/api';
 import './map.css';
@@ -74,7 +74,18 @@ function MapComponent({ origin, destination, waypoints, toggleRefresh }) {
 export default function AppGoogleMapsAPI({ title, subheader, origin, destination, waypoints, toggleRefresh }) {
   return (
     <Card>
-      <CardHeader title={title} subheader={subheader} />
+      <CardHeader
+        title={
+          <Typography variant="h5" style={{ fontSize: '24px' }}>
+            {title}
+          </Typography>
+        }
+        subheader={
+          <Typography variant="subtitle1" style={{ fontSize: '16px', fontWeight: 'lighter' }}>
+            {subheader}
+          </Typography>
+        }
+      />
       <Box sx={{ mx: 3, my: 3 }} dir="ltr">
         <MapComponent origin={origin} destination={destination} waypoints={waypoints} toggleRefresh={toggleRefresh} />
       </Box>

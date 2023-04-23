@@ -34,6 +34,9 @@ export default function DashboardAppPage() {
     setToggleRefresh,
   ] = useOutletContext();
 
+  const formattedStartDate = new Date(startDate).toLocaleDateString('en-US', {month: '2-digit', day: '2-digit', year: 'numeric'});
+  const formattedEndDate = new Date(endDate).toLocaleDateString('en-US', {month: '2-digit', day: '2-digit', year: 'numeric'});
+
   const navigate = useNavigate();
 
   return (
@@ -63,7 +66,7 @@ export default function DashboardAppPage() {
           <Grid item xs={12} md={12} lg={12}>
             <AppGoogleMapsAPI
               title={name !== '' ? name : 'Tripper Map'}
-              subheader={name !== '' ? `${startDate} to ${endDate}` : 'Plan your next trip!'}
+              subheader={name !== '' ? `${formattedStartDate} to ${formattedEndDate}` : 'Plan your next trip!'}
               origin={origin}
               destination={destination}
               waypoints={waypts}
