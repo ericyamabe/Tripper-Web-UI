@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { Button, Stack, TextField } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Button, Stack, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Iconify from '../../../components/iconify';
 
-function InitializeTextfield({ value, onChange, onRemove }) {
+function InitializeTextfield({ value, onChange, onRemove, index }) {
   return (
     <Stack alignItems="center" sx={{ m: 1 }} direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1, sm: 2, md: 4 }}>
       <TextField
@@ -17,7 +17,7 @@ function InitializeTextfield({ value, onChange, onRemove }) {
         onChange={onChange}
       />
       <Stack alignItems="center" direction={{ xs: 'row', sm: 'row' }}>
-        <Button sx={{}} variant="outlined" startIcon={<Iconify icon="eva:minus-fill" />} onClick={onRemove}>
+        <Button variant="outlined" startIcon={<Iconify icon="eva:minus-fill" />} onClick={onRemove}>
           Remove
         </Button>
       </Stack>
@@ -26,49 +26,55 @@ function InitializeTextfield({ value, onChange, onRemove }) {
 }
 
 export default function StopList({ setToggleRefresh, waypoints, setWaypts, setOrigin, setDestination, setName }) {
+  const [localFields, setLocalFields] = useState([]);
   const [fields, setFields] = useState([]);
 
+  useEffect(() => {
+    if (waypoints.length > 0) {
+      const initialFields = waypoints.map((waypoint) => waypoint.location);
+      setLocalFields(initialFields);
+      setFields(initialFields);
+    }
+  }, [waypoints]);
+
   const handleAddField = () => {
-    if (fields.length < 10) {
-      setFields([...fields, '']);
+    if (localFields.length < 10) {
+      setLocalFields([...localFields, '']);
     }
   };
 
   const handleUpdate = (index, newValue) => {
-    const newFields = [...fields];
+    const newFields = [...localFields];
     newFields[index] = newValue;
-    setFields(newFields);
+    setLocalFields(newFields);
   };
 
   const handleRemove = (index) => {
-    const newFields = [...fields];
+    const newFields = [...localFields];
     newFields.splice(index, 1);
+    setLocalFields(newFields);
 
-    const nonEmptyFields = newFields.filter((field) => field !== '');
-    setFields(newFields);
-
-    if (nonEmptyFields.length === 0) {
-      setWaypts([]);
-    } else {
-      const formattedFields = nonEmptyFields.map((field) => ({ location: field }));
-      setWaypts(formattedFields);
-    }
+    const newWaypoints = [...waypoints];
+    newWaypoints.splice(index, 1);
+    setWaypts(newWaypoints);
 
     setToggleRefresh((prev) => !prev);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const filteredFields = fields.filter((field) => field !== '');
+    const filteredFields = localFields.filter((field) => field !== '');
     const formattedFields = filteredFields.map((field) => ({ location: field }));
     setWaypts(formattedFields);
-    console.log(formattedFields)
+    setFields(localFields);
+    setLocalFields([]);
     setToggleRefresh((prev) => !prev);
   };
 
   const handleRemoveWaypoints = () => {
     setWaypts([]);
     setFields([]);
+    setLocalFields([]);
     setToggleRefresh((prev) => !prev);
   };
 
@@ -77,22 +83,38 @@ export default function StopList({ setToggleRefresh, waypoints, setWaypts, setOr
     setDestination('');
     setName('');
     setWaypts([]);
+    setFields([]);
+    setLocalFields([]);
     setToggleRefresh((prev) => !prev);
   };
 
   return (
     <form onSubmit={handleSubmit}>
       <Stack alignItems="center" direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1, sm: 2, md: 4 }}>
-        <LoadingButton
-          sx={{ my: 1, p: 1 }}
-          fullWidth
-          size="large"
-          variant="contained"
-          startIcon={<Iconify icon="eva:minus-fill" />}
-          onClick={handleRemoveWaypoints}
-        >
-          Remove all stops
-        </LoadingButton>
+        {waypoints.length > 0 ? (
+          <LoadingButton
+            sx={{ my: 1, p: 1 }}
+            fullWidth
+            size="large"
+            variant="contained"
+            startIcon={<Iconify icon="eva:minus-fill" />}
+            onClick={handleRemoveWaypoints}
+          >
+            Remove all stops
+          </LoadingButton>
+        ) : (
+          <LoadingButton
+            sx={{ my: 1, p: 1 }}
+            fullWidth
+            size="large"
+            variant="contained"
+            disabled
+            startIcon={<Iconify icon="eva:minus-fill" />}
+            onClick={handleRemoveWaypoints}
+          >
+            Remove all stops
+          </LoadingButton>
+        )}
         <LoadingButton
           sx={{ my: 1, p: 1 }}
           fullWidth
@@ -113,19 +135,20 @@ export default function StopList({ setToggleRefresh, waypoints, setWaypts, setOr
         startIcon={<Iconify icon="eva:plus-fill" />}
         onClick={handleAddField}
       >
-        {fields.length === 0 && 'Add a Stop'}
-        {fields.length > 0 && fields.length !== 10 && <div>Add a Stop: ({fields.length} of 10)</div>}
-        {fields.length === 10 && <div>Max stops added!</div>}
+        {localFields.length === 0 && 'Add a Stop'}
+        {localFields.length > 0 && localFields.length !== 10 && <div>Add a Stop: ({localFields.length} of 10)</div>}
+        {localFields.length === 10 && <div>Max stops added!</div>}
       </LoadingButton>
-      {fields.map((value, index) => (
+      {localFields.map((value, index) => (
         <InitializeTextfield
           key={index}
           value={value}
           onChange={(e) => handleUpdate(index, e.target.value)}
           onRemove={() => handleRemove(index)}
+          index={index}
         />
       ))}
-      {fields.length > 0 && (
+      {localFields.length > 0 && (
         <>
           <LoadingButton
             sx={{ m: 1, p: 1 }}

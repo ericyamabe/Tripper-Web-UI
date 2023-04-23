@@ -33,12 +33,8 @@ export default function AddTripPage() {
     formData.append('destination', destination);
     formData.append('start_date', start_date);
     formData.append('end_date', end_date);
-    console.log(stop_locations)
-    // const stopLocationsArray = stop_locations.map((location) => ({ location }));
-    // formData.append('stop_locations', JSON.stringify(stopLocationsArray));
-    const stopLocationsString = stop_locations.map(location => `{"location":"${location}"}`).join(',');
-    formData.append('stop_locations', stopLocationsString);
-
+    const stopLocationsArray = stop_locations.map((location) => ({ location }));
+    formData.append('stop_locations', JSON.stringify(stopLocationsArray));
     formData.append('stop_criteria', '{}');
 
     console.log('Form Data:');
@@ -142,7 +138,6 @@ export default function AddTripPage() {
                             const newLocations = [...stop_locations];
                             newLocations[index] = event.target.value;
                             setStop_locations(newLocations);
-                            console.log(stop_locations);
                           }}
                         />
                         <Button
@@ -158,7 +153,6 @@ export default function AddTripPage() {
                         </Button>
                       </Box>
                     ))}
-                    {/* <AddPageStopList tempStop_locations={tempStop_locations} setTempStop_locations={setTempStop_locations} /> */}
                     <TextField
                       id="start_date"
                       label="Start Date"

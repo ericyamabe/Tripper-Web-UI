@@ -186,8 +186,7 @@ export default function TripsPage() {
     setOrigin(tempOrigin);
     setDestination(tempDestination);
     setWaypts([])
-    if (tempStopLocations.some(obj => Object.keys(obj).length !== 0)) {
-      console.log('test');
+    if (tempStopLocations.length > 0) {
       setWaypts(tempStopLocations);
     }
     navigate('..', { replace: true });
@@ -234,7 +233,7 @@ export default function TripsPage() {
     setTempEndDate(end_date);
     setTempOrigin(start);
     setTempDestination(destination);
-    setTempStopLocations([stop_locations]);
+    setTempStopLocations(stop_locations);
   };
 
   const handleChangePage = (event, newPage) => {
