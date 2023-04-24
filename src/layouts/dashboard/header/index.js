@@ -57,7 +57,7 @@ export default function Header({ onOpenNav, user, email, isLoaded }) {
           <Iconify icon="eva:menu-2-fill" />
         </IconButton>
 
-        <Searchbar />
+        {/* <Searchbar /> */}
         <Box sx={{ flexGrow: 1 }} />
 
         <Stack
@@ -68,8 +68,8 @@ export default function Header({ onOpenNav, user, email, isLoaded }) {
             sm: 1,
           }}
         >
-          <LanguagePopover />
-          <NotificationsPopover />
+          {/* <LanguagePopover /> */}
+          {/* <NotificationsPopover /> */}
           <AccountPopover isLoaded={isLoaded} user={user} email={email} />
         </Stack>
       </StyledToolbar>

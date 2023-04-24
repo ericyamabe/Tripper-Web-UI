@@ -39,11 +39,17 @@ export default function DashboardLayout() {
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
   const [waypts, setWaypts] = useState([]);
+  const [uuid, setUuid] = useState('');
+  const [name, setName] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [user, setUser] = useState('Guest');
   const [email, setEmail] = useState('');
+  const [status, setStatus] = useState('');
   const [role, setRole] = useState('');
+  const [toggleRefresh, setToggleRefresh] = useState(false);
 
   useEffect(() => {
     axios
@@ -83,8 +89,22 @@ export default function DashboardLayout() {
             setDestination,
             waypts,
             setWaypts,
+            uuid,
+            setUuid,
+            name,
+            setName,
+            startDate,
+            setStartDate,
+            endDate,
+            setEndDate,
             isLoaded,
+            setIsLoaded,
             user,
+            setUser,
+            toggleRefresh,
+            setToggleRefresh,
+            status,
+            setStatus,
           ]}
         />
       </Main>

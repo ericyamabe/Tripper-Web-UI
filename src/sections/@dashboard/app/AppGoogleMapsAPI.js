@@ -1,17 +1,10 @@
 import React, { useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 // @mui
-import { Box, Card, CardHeader, Stack, TextField } from '@mui/material';
+import { Box, Card, CardHeader, Typography } from '@mui/material';
 // Google Maps API
-import {
-  GoogleMap,
-  useLoadScript,
-  StandaloneSearchBox,
-  DirectionsService,
-  DirectionsRenderer,
-} from '@react-google-maps/api';
+import { GoogleMap, useLoadScript, DirectionsService, DirectionsRenderer } from '@react-google-maps/api';
 import './map.css';
-import { LoadingButton } from '@mui/lab';
 
 // ----------------------------------------------------------------------
 
@@ -21,19 +14,10 @@ AppGoogleMapsAPI.propTypes = {
 };
 
 const lib = ['places', 'routes'];
-const options = {};
 
 function Map({ origin, destination, waypoints }) {
   const center = useMemo(() => ({ lat: 34.2407, lng: -118.53 }), []);
-  // const [searchBox, setSearchBox] = useState(null);
   const [response, setResponse] = useState(null);
-
-  // // search box
-  // const onPlacesChanged = () => console.log(searchBox.getPlaces());
-  // // search box
-  // const onSBLoad = (ref) => {
-  //   setSearchBox(ref);
-  // };
 
   const count = useRef(0);
 
@@ -62,28 +46,6 @@ function Map({ origin, destination, waypoints }) {
   return (
     <GoogleMap zoom={17} center={center} mapContainerStyle={{ width: '100%', height: '60vh' }}>
       <>
-        {/* <StandaloneSearchBox onPlacesChanged={onPlacesChanged} onLoad={onSBLoad}> */}
-        {/*   <input */}
-        {/*     type="text" */}
-        {/*     placeholder="Search with Autocomplete" */}
-        {/*     style={{ */}
-        {/*       boxSizing: 'border-box', */}
-        {/*       border: `1px solid transparent`, */}
-        {/*       width: `270px`, */}
-        {/*       height: `40px`, */}
-        {/*       padding: `0 12px`, */}
-        {/*       borderRadius: `3px`, */}
-        {/*       boxShadow: `0 2px 6px rgba(0, 0, 0, 0.3)`, */}
-        {/*       fontSize: `14px`, */}
-        {/*       outline: `none`, */}
-        {/*       margin: 'center', */}
-        {/*       textOverflow: `ellipses`, */}
-        {/*       position: 'absolute', */}
-        {/*       top: '0px', */}
-        {/*       marginLeft: '40%', */}
-        {/*     }} */}
-        {/*   /> */}
-        {/* </StandaloneSearchBox> */}
         {response !== null && (
           <DirectionsRenderer
             options={{
@@ -109,80 +71,23 @@ function MapComponent({ origin, destination, waypoints, toggleRefresh }) {
   return <Map origin={origin} destination={destination} waypoints={waypoints} key={toggleRefresh} />;
 }
 
-export default function AppGoogleMapsAPI({
-  title,
-  subheader,
-  origin,
-  setOrigin,
-  destination,
-  setDestination,
-  waypoints,
-  setWaypts,
-}) {
-  const [input, setInput] = useState('');
-  const [toggleRefresh, setToggleRefresh] = useState(false);
-
-  const handleAddWaypoint = () => {
-    setWaypts((prevWaypts) => [
-      ...prevWaypts,
-      {
-        location: input.valueOf(),
-      },
-    ]);
-    setToggleRefresh((prev) => !prev);
-  };
-
-  const handleRemoveWaypoints = () => {
-    setWaypts([]);
-    setToggleRefresh((prev) => !prev);
-  };
-
-  const handleClearMap = () => {
-    setOrigin('');
-    setDestination('');
-    setWaypts([]);
-    setToggleRefresh((prev) => !prev);
-  };
-
+export default function AppGoogleMapsAPI({ title, subheader, origin, destination, waypoints, toggleRefresh }) {
   return (
     <Card>
-      <CardHeader title={title} subheader={subheader} />
+      <CardHeader
+        title={
+          <Typography variant="h5" style={{ fontSize: '24px' }}>
+            {title}
+          </Typography>
+        }
+        subheader={
+          <Typography variant="subtitle1" style={{ fontSize: '16px', fontWeight: 'lighter' }}>
+            {subheader}
+          </Typography>
+        }
+      />
       <Box sx={{ mx: 3, my: 3 }} dir="ltr">
         <MapComponent origin={origin} destination={destination} waypoints={waypoints} toggleRefresh={toggleRefresh} />
-        {origin === '' ? (
-          ''
-        ) : (
-          <>
-            {/* <Grid container spacing={3} sx={{ m: 3 }}> */}
-            {/*   <Grid item xs={12} md={12} lg={12}> */}
-            <Card sx={{ m: 3, p: 3 }}>
-              Add waypoint?
-              <Stack spacing={3}>
-                <TextField
-                  sx={{ m: 2 }}
-                  name="waypoint"
-                  label="Set Waypoint..."
-                  id="waypoint"
-                  defaultValue={input}
-                  onBlur={(e) => setInput(e.target.value)}
-                />
-              </Stack>
-              <Stack alignItems="center" direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1, sm: 2, md: 4 }}>
-                <LoadingButton sx={{ m: 1, p: 1 }} fullWidth size="large" variant="contained" onClick={handleAddWaypoint}>
-                  Add waypoint
-                </LoadingButton>
-                <LoadingButton sx={{ m: 1, p: 1 }} fullWidth size="large" variant="contained" onClick={handleRemoveWaypoints}>
-                  Remove all waypoints
-                </LoadingButton>
-                <LoadingButton sx={{ m: 1, p: 1 }} fullWidth size="large" variant="contained" onClick={handleClearMap}>
-                  Clear map
-                </LoadingButton>
-              </Stack>
-            </Card>
-            {/*   </Grid> */}
-            {/* </Grid> */}
-          </>
-        )}
       </Box>
     </Card>
   );

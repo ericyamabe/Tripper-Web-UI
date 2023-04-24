@@ -1,16 +1,43 @@
 import React from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 // // @mui
-import { Grid, Container, Typography, TextField, Box, Card, Button, Stack } from '@mui/material';
-// // components
+import { Grid, Container, Typography, Card, Stack } from '@mui/material';
 // sections
+import { LoadingButton } from '@mui/lab';
 import { AppGoogleMapsAPI } from '../sections/@dashboard/app';
+import { StopList } from '../sections/@dashboard/trip';
 
 // ----------------------------------------------------------------------
 
 export default function DashboardAppPage() {
-  const [origin, setOrigin, destination, setDestination, waypts, setWaypts, isLoaded, user] = useOutletContext();
+  const [
+    origin,
+    setOrigin,
+    destination,
+    setDestination,
+    waypts,
+    setWaypts,
+    uuid,
+    setUuid,
+    name,
+    setName,
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate,
+    isLoaded,
+    setIsLoaded,
+    user,
+    setUser,
+    toggleRefresh,
+    setToggleRefresh,
+  ] = useOutletContext();
+
+  const formattedStartDate = new Date(startDate).toLocaleDateString('en-US', {month: '2-digit', day: '2-digit', year: 'numeric'});
+  const formattedEndDate = new Date(endDate).toLocaleDateString('en-US', {month: '2-digit', day: '2-digit', year: 'numeric'});
+
+  const navigate = useNavigate();
 
   return (
     <>
@@ -35,18 +62,51 @@ export default function DashboardAppPage() {
           </>
         )}
 
-        <Grid container spacing={3}>
+        <Grid container spacing={3} justifyContent="center">
           <Grid item xs={12} md={12} lg={12}>
             <AppGoogleMapsAPI
-              title="Tripper Map"
-              subheader="Plan your next trip!"
+              title={name !== '' ? name : 'Tripper Map'}
+              subheader={name !== '' ? `${formattedStartDate} to ${formattedEndDate}` : 'Plan your next trip!'}
               origin={origin}
-              setOrigin={setOrigin}
               destination={destination}
-              setDestination={setDestination}
               waypoints={waypts}
-              setWaypts={setWaypts}
+              toggleRefresh={toggleRefresh}
             />
+            <Grid container item xs={12} justifyContent="center">
+              <Card sx={{ mt: 3, p: 3, width: 0.75 }}>
+                {origin !== '' ? (
+                  <StopList
+                    setToggleRefresh={setToggleRefresh}
+                    waypoints={waypts}
+                    setWaypts={setWaypts}
+                    setOrigin={setOrigin}
+                    setDestination={setDestination}
+                    setName={setName}
+                  />
+                ) : (
+                  <Stack alignItems="center" direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1, sm: 2, md: 4 }}>
+                    <LoadingButton
+                      sx={{ m: 1, p: 1 }}
+                      fullWidth
+                      size="large"
+                      variant="contained"
+                      onClick={() => navigate('/dashboard/profile', { replace: true })}
+                    >
+                      View Profile
+                    </LoadingButton>
+                    <LoadingButton
+                      sx={{ m: 1, p: 1 }}
+                      fullWidth
+                      size="large"
+                      variant="contained"
+                      onClick={() => navigate('/dashboard/trips', { replace: true })}
+                    >
+                      View Trips
+                    </LoadingButton>
+                  </Stack>
+                )}
+              </Card>
+            </Grid>
           </Grid>
         </Grid>
       </Container>

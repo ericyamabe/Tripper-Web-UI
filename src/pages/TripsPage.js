@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet-async';
-import { filter, sample } from 'lodash';
+import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
 import { useEffect, useState } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
@@ -20,18 +20,17 @@ import {
   TableCell,
   Container,
   Typography,
-  IconButton,
   TableContainer,
   TablePagination,
 } from '@mui/material';
 // components
-// import { faker } from '@faker-js/faker';
 import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
 import { TripListHead, TripListToolbar } from '../sections/@dashboard/trip';
 import { TRIP_DASHBOARD_URL } from '../sections/auth/api/urls';
+/* eslint-disable camelcase */
 
 // ----------------------------------------------------------------------
 
@@ -42,7 +41,6 @@ const TABLE_HEAD = [
   { id: 'start_date', label: 'Start Date', alignRight: false },
   { id: 'end_date', label: 'End Date', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
-  { id: '' },
 ];
 
 // ----------------------------------------------------------------------
@@ -54,13 +52,16 @@ function descendingComparator(a, b, orderBy) {
   if (b[orderBy] > a[orderBy]) {
     return 1;
   }
-  return 0;
+  // if values are equal, return the opposite of ascending order result
+  return orderBy === 'status' ? -descendingComparator(a, b, 'name') : 0;
 }
 
 function getComparator(order, orderBy) {
   return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
+      ? (a, b) => descendingComparator(a, b, orderBy)
+      : orderBy === 'status'
+          ? (a, b) => descendingComparator(a, b, 'notes')
+          : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
 function applySortFilter(array, comparator, query) {
@@ -81,18 +82,45 @@ export default function TripsPage() {
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
   const [selected, setSelected] = useState([]);
+  const [isSelected, setIsSelected] = useState(false);
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [error, setError] = useState(null);
   const [trips, setTrips] = useState([]);
-  const [origin, setOrigin, destination, setDestination] = useOutletContext();
+  const [tempUuid, setTempUuid] = useState('');
+  const [tempName, setTempName] = useState('');
+  const [tempStartDate, setTempStartDate] = useState('');
+  const [tempEndDate, setTempEndDate] = useState('');
+  const [tempOrigin, setTempOrigin] = useState('');
+  const [tempDestination, setTempDestination] = useState('');
+  const [tempStopLocations, setTempStopLocations] = useState([]);
+  const [tempStatus, setTempStatus] = useState('');
+
+  const [
+    origin,
+    setOrigin,
+    destination,
+    setDestination,
+    waypts,
+    setWaypts,
+    uuid,
+    setUuid,
+    name,
+    setName,
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate,
+    isLoaded,
+    setIsLoaded,
+  ] = useOutletContext();
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchTrips();
+    fetchTrips().catch((err) => {
+      console.log(err);
+    });
   }, []);
 
   async function fetchTrips() {
@@ -101,13 +129,9 @@ export default function TripsPage() {
         withCredentials: true,
       });
       setTrips(res.data);
-      console.log(trips);
       setIsLoaded(true);
     } catch (err) {
-      setError(true);
-      console.log(err);
-      console.log(error);
-      setIsLoaded(true);
+      throw new Error(err);
     }
   }
 
@@ -119,12 +143,9 @@ export default function TripsPage() {
     destination: trips[index].destination,
     start_date: trips[index].start_date,
     end_date: trips[index].end_date,
-    status: sample(['complete', 'planned']), // lodash fake data
+    stop_locations: trips[index].stop_locations,
+    notes: trips[index].notes,
   }));
-
-  const handleOpenMenu = (event) => {
-    setOpen(event.currentTarget);
-  };
 
   const handleCloseMenu = () => {
     setOpen(null);
@@ -134,18 +155,36 @@ export default function TripsPage() {
     navigate('addtrip', { replace: true });
   };
 
-  const handleDeleteTrip = () => {
-    // delete function not yet added
-  };
-
-  const handleEditTrip = (e) => {
-    // console.log(trips[1].uuid) // need to get array index of selected row
-    // setEditUuid(trips[1]);
-    navigate('editTrip', { replace: true });
-    // if (e.target.innerText === 'Edit') navigate('/dashboard/trips/edittrip', { replace: true });
+  const handleEditTrip = () => {
+    setUuid(tempUuid);
+    setName(tempName);
+    setStartDate(tempStartDate);
+    setEndDate(tempEndDate);
+    setOrigin(tempOrigin);
+    setDestination(tempDestination);
+    setWaypts([]);
+    if (tempStopLocations.length > 0) {
+      setWaypts(tempStopLocations);
+    }
+    navigate('edittrip', {
+      replace: true,
+      state: {
+        passStatus: tempStatus,
+      },
+    });
   };
 
   const handleViewTrip = () => {
+    setUuid(tempUuid);
+    setName(tempName);
+    setStartDate(tempStartDate);
+    setEndDate(tempEndDate);
+    setOrigin(tempOrigin);
+    setDestination(tempDestination);
+    setWaypts([]);
+    if (tempStopLocations.length > 0) {
+      setWaypts(tempStopLocations);
+    }
     navigate('..', { replace: true });
   };
 
@@ -164,7 +203,7 @@ export default function TripsPage() {
     setSelected([]);
   };
 
-  const handleClick = (event, name, start, destination) => {
+  const handleClick = (event, uuid, name, start, destination, start_date, end_date, stop_locations, notes) => {
     const selectedIndex = selected.indexOf(name);
     let newSelected = [];
     if (selectedIndex === -1) {
@@ -178,11 +217,17 @@ export default function TripsPage() {
     }
     setSelected(newSelected);
 
-    console.log(start);
-    console.log(destination);
+    if (selectedIndex === 0) setIsSelected(false);
+    else setIsSelected(true);
 
-    setOrigin(start);
-    setDestination(destination);
+    setTempUuid(uuid);
+    setTempName(name);
+    setTempStartDate(start_date);
+    setTempEndDate(end_date);
+    setTempOrigin(start);
+    setTempDestination(destination);
+    setTempStopLocations(stop_locations);
+    setTempStatus(notes);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -200,9 +245,7 @@ export default function TripsPage() {
   };
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - TRIPSLIST.length) : 0;
-
   const filteredUsers = applySortFilter(TRIPSLIST, getComparator(order, orderBy), filterName);
-
   const isNotFound = !filteredUsers.length && !!filterName;
 
   return (
@@ -216,13 +259,31 @@ export default function TripsPage() {
           <Typography variant="h4" gutterBottom>
             Trips
           </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleAddTrip}>
-            Add Trip
-          </Button>
+          {!isSelected ? (
+            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleAddTrip}>
+              Add Trip
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              size="large"
+              color="secondary"
+              startIcon={<Iconify icon="ic:baseline-remove-red-eye" />}
+              onClick={handleViewTrip}
+            >
+              View Trip
+            </Button>
+          )}
         </Stack>
 
         <Card>
-          <TripListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
+          <TripListToolbar
+            numSelected={selected.length}
+            filterName={filterName}
+            name={tempName}
+            onFilterName={handleFilterByName}
+            onHandleEditTrip={handleEditTrip}
+          />
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
@@ -239,15 +300,20 @@ export default function TripsPage() {
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                     // eslint-disable-next-line camelcase
-                    const { uuid, name, start_date, status, start, destination, avatarUrl, end_date } = row;
+                    const { uuid, name, start_date, notes, start, destination, avatarUrl, end_date, stop_locations } =
+                      row;
                     const selectedTrip = selected.indexOf(name) !== -1;
+                    const disabled = selected.length > 0 && !selectedTrip; // Add this line
 
                     return (
                       <TableRow hover key={uuid} tabIndex={-1} role="checkbox" selected={selectedTrip}>
                         <TableCell padding="checkbox">
                           <Checkbox
                             checked={selectedTrip}
-                            onChange={(event) => handleClick(event, name, start, destination)}
+                            onChange={(event) =>
+                              handleClick(event, uuid, name, start, destination, start_date, end_date, stop_locations, notes)
+                            }
+                            disabled={disabled}
                           />
                         </TableCell>
 
@@ -263,18 +329,16 @@ export default function TripsPage() {
                         <TableCell align="left">{start}</TableCell>
                         <TableCell align="left">{destination}</TableCell>
                         {/* eslint-disable-next-line camelcase */}
-                        <TableCell align="left">{start_date}</TableCell>
+                        <TableCell align="left" style={{ minWidth: 130 }}>
+                          {start_date}
+                        </TableCell>
                         {/* eslint-disable-next-line camelcase */}
-                        <TableCell align="left">{end_date}</TableCell>
-
-                        <TableCell align="left">
-                          <Label color={(status === 'planned' && 'warning') || 'success'}>{sentenceCase(status)}</Label>
+                        <TableCell align="left" style={{ minWidth: 130 }}>
+                          {end_date}
                         </TableCell>
 
-                        <TableCell align="right">
-                          <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
-                            <Iconify icon={'eva:more-vertical-fill'} />
-                          </IconButton>
+                        <TableCell align="left">
+                          <Label color={(notes === 'planned' && 'warning') || 'success'}>{sentenceCase(notes)}</Label>
                         </TableCell>
                       </TableRow>
                     );
