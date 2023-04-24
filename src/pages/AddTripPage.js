@@ -79,7 +79,7 @@ export default function AddTripPage() {
             <Grid item xs={12} md={6} lg={8}>
               <Box py={5}>
                 <form onSubmit={handleSubmit}>
-                  <Stack spacing={2}>
+                  <Stack spacing={2} sx={{ m: 1 }}>
                     <TextField
                       id="name"
                       label="Name"
@@ -145,7 +145,7 @@ export default function AddTripPage() {
                         />
                         <Button
                           variant="outlined"
-                          sx={{mr: 1}}
+                          sx={{ mr: 1 }}
                           onClick={() => {
                             const newLocations = [...stop_locations];
                             newLocations.splice(index, 1);

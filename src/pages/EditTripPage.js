@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useLocation, useNavigate, useOutletContext } from 'react-router-dom';
 // @mui
-import { Box, Button, Card, Checkbox, Container, Grid, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, Card, Checkbox, Container, Grid, Modal, Stack, TextField, Typography } from '@mui/material';
 import axios from '../sections/auth/api/axios';
 import { TRIP_UPDATE_URL } from '../sections/auth/api/urls';
 import GetCookie from '../sections/auth/api/GetCookie';
@@ -11,6 +11,9 @@ import Iconify from '../components/iconify';
 
 export default function EditTripPage() {
   const [error, setError] = useState('');
+  const [deleteTrip, setDeleteTrip] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState(false);
   const { state } = useLocation();
   const { passStatus } = state;
   const [
@@ -57,7 +60,7 @@ export default function EditTripPage() {
     navigate('/dashboard/trips', { replace: true });
   };
 
-  const handleCheckboxClick = (event) => {
+  const handleStatusCheckboxClick = (event) => {
     if (event.target.checked) {
       setStatus('complete');
     } else {
@@ -65,9 +68,21 @@ export default function EditTripPage() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleDeleteCheckboxClick = (event) => {
+    if (event.target.checked) {
+      setDeleteTrip(true);
+    } else {
+      setDeleteTrip(false);
+    }
+  };
 
+  const handleDeleteConfirmed = () => {
+    setShowDeleteConfirmation(false);
+    setDeleteConfirmation(true);
+    handleDeleteSubmit();
+  };
+
+  const handleDeleteSubmit = async () => {
     const formData = new FormData();
 
     formData.append('uuid', uuid);
@@ -80,6 +95,7 @@ export default function EditTripPage() {
     formData.append('stop_locations', JSON.stringify(stopLocationsArray));
     formData.append('stop_criteria', '{}');
     formData.append('notes', status);
+    formData.append('deleted', deleteTrip ? 'True' : 'False'); // convert to boolean
 
     try {
       const response = await axios.post(TRIP_UPDATE_URL, formData, {
@@ -96,6 +112,46 @@ export default function EditTripPage() {
         setError('Wrong format.');
       } else if (err.response?.status === 500) {
         setError('Wrong format.');
+      }
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+
+    if (deleteTrip && !deleteConfirmation) {
+      setShowDeleteConfirmation(true);
+    } else {
+      formData.append('uuid', uuid);
+      formData.append('name', name);
+      formData.append('start', origin);
+      formData.append('destination', destination);
+      formData.append('start_date', startDate);
+      formData.append('end_date', endDate);
+      const stopLocationsArray = stop_locations.map((location) => ({ location }));
+      formData.append('stop_locations', JSON.stringify(stopLocationsArray));
+      formData.append('stop_criteria', '{}');
+      formData.append('notes', status);
+      formData.append('deleted', 'False'); // convert to boolean
+
+      try {
+        const response = await axios.post(TRIP_UPDATE_URL, formData, {
+          headers: { 'Content-Type': 'multipart/form-data', 'X-CSRFToken': csrfFromCookie },
+          withCredentials: true,
+        });
+        console.log(JSON.stringify(response?.data));
+        navigate('/dashboard/trips', { replace: true });
+      } catch (err) {
+        console.log(err);
+        if (!err?.response) {
+          setError('No Server Response');
+        } else if (err.response?.status === 501) {
+          setError('Wrong format.');
+        } else if (err.response?.status === 500) {
+          setError('Wrong format.');
+        }
       }
     }
   };
@@ -117,7 +173,7 @@ export default function EditTripPage() {
             <Grid item xs={12} md={6} lg={8}>
               <Box py={5}>
                 <form onSubmit={handleSubmit}>
-                  <Stack spacing={2}>
+                  <Stack spacing={2} sx={{ m: 1 }}>
                     <TextField
                       id="name"
                       label="Name"
@@ -212,11 +268,49 @@ export default function EditTripPage() {
                         setEndDate(event.target.value);
                       }}
                     />
-                    <div>
-                      <Checkbox checked={status === 'complete'} onClick={handleCheckboxClick} />
-                      Trip Completed?
-                    </div>
+                    <Grid container alignItems="center" justifyContent="center">
+                      <Grid item s="12" sx={{ px: 2 }}>
+                        <Checkbox checked={status === 'complete'} onClick={handleStatusCheckboxClick} />
+                        Trip Completed?
+                      </Grid>
+                      <Grid item s="12" sx={{ px: 2 }}>
+                        <Checkbox onClick={handleDeleteCheckboxClick} />
+                        Delete Trip?
+                      </Grid>
+                    </Grid>
                     <div>{error && <small className="text-danger">{error}</small>}</div>
+                    <Modal
+                      open={showDeleteConfirmation}
+                      onClose={() => setShowDeleteConfirmation(false)}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        m: 1,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          p: 2,
+                          backgroundColor: 'white',
+                          borderRadius: '4px',
+                          boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.1)',
+                          maxWidth: '500px',
+                          width: '100%',
+                          textAlign: 'center', // add this line to center the text
+                        }}
+                      >
+                        <Typography variant="h5" gutterBottom>
+                          Are you sure you want to delete this trip?
+                        </Typography>
+                        <Button variant="contained" sx={{ mx: 1 }} onClick={handleDeleteConfirmed}>
+                          Yes, delete it
+                        </Button>
+                        <Button variant="outlined" sx={{ mx: 1 }} onClick={() => setShowDeleteConfirmation(false)}>
+                          Cancel
+                        </Button>
+                      </Box>
+                    </Modal>
                     <Grid container item xs={12} justifyContent="center">
                       <Stack
                         alignItems="center"
