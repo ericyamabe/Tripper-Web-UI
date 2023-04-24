@@ -3,7 +3,7 @@ import { Button, Stack, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Iconify from '../../../components/iconify';
 
-function InitializeTextfield({ value, onChange, onRemove, index }) {
+function InitializeTextfield({ value, onChange, onRemove }) {
   return (
     <Stack alignItems="center" sx={{ m: 1 }} direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1, sm: 2, md: 4 }}>
       <TextField
@@ -26,33 +26,31 @@ function InitializeTextfield({ value, onChange, onRemove, index }) {
 }
 
 export default function StopList({ setToggleRefresh, waypoints, setWaypts, setOrigin, setDestination, setName }) {
-  const [localFields, setLocalFields] = useState([]);
   const [fields, setFields] = useState([]);
 
   useEffect(() => {
     if (waypoints.length > 0) {
       const initialFields = waypoints.map((waypoint) => waypoint.location);
-      setLocalFields(initialFields);
       setFields(initialFields);
     }
   }, [waypoints]);
 
   const handleAddField = () => {
-    if (localFields.length < 10) {
-      setLocalFields([...localFields, '']);
+    if (fields.length < 10) {
+      setFields([...fields, '']);
     }
   };
 
   const handleUpdate = (index, newValue) => {
-    const newFields = [...localFields];
+    const newFields = [...fields];
     newFields[index] = newValue;
-    setLocalFields(newFields);
+    setFields(newFields);
   };
 
   const handleRemove = (index) => {
-    const newFields = [...localFields];
+    const newFields = [...fields];
     newFields.splice(index, 1);
-    setLocalFields(newFields);
+    setFields(newFields);
 
     const newWaypoints = [...waypoints];
     newWaypoints.splice(index, 1);
@@ -63,18 +61,16 @@ export default function StopList({ setToggleRefresh, waypoints, setWaypts, setOr
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const filteredFields = localFields.filter((field) => field !== '');
+    const filteredFields = fields.filter((field) => field !== '');
     const formattedFields = filteredFields.map((field) => ({ location: field }));
     setWaypts(formattedFields);
-    setFields(localFields);
-    setLocalFields([]);
+    setFields([]);
     setToggleRefresh((prev) => !prev);
   };
 
   const handleRemoveWaypoints = () => {
     setWaypts([]);
     setFields([]);
-    setLocalFields([]);
     setToggleRefresh((prev) => !prev);
   };
 
@@ -84,7 +80,6 @@ export default function StopList({ setToggleRefresh, waypoints, setWaypts, setOr
     setName('');
     setWaypts([]);
     setFields([]);
-    setLocalFields([]);
     setToggleRefresh((prev) => !prev);
   };
 
@@ -135,20 +130,19 @@ export default function StopList({ setToggleRefresh, waypoints, setWaypts, setOr
         startIcon={<Iconify icon="eva:plus-fill" />}
         onClick={handleAddField}
       >
-        {localFields.length === 0 && 'Add a Stop'}
-        {localFields.length > 0 && localFields.length !== 10 && <div>Add a Stop: ({localFields.length} of 10)</div>}
-        {localFields.length === 10 && <div>Max stops added!</div>}
+        {fields.length === 0 && 'Add a Stop'}
+        {fields.length > 0 && fields.length !== 10 && <div>Add a Stop: ({fields.length} of 10)</div>}
+        {fields.length === 10 && <div>Max stops added!</div>}
       </LoadingButton>
-      {localFields.map((value, index) => (
+      {fields.map((value, index) => (
         <InitializeTextfield
           key={index}
           value={value}
           onChange={(e) => handleUpdate(index, e.target.value)}
           onRemove={() => handleRemove(index)}
-          index={index}
         />
       ))}
-      {localFields.length > 0 && (
+      {fields.length > 0 && (
         <>
           <LoadingButton
             sx={{ m: 1, p: 1 }}

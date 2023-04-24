@@ -29,11 +29,11 @@ TripListHead.propTypes = {
 export default function TripListHead({
   order,
   orderBy,
-  rowCount,
+  // rowCount,
   headLabel,
-  numSelected,
+  // numSelected,
   onRequestSort,
-  onSelectAllClick,
+  // onSelectAllClick,
 }) {
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
@@ -43,12 +43,12 @@ export default function TripListHead({
     <TableHead>
       <TableRow>
         <TableCell padding="checkbox">
-          <Checkbox
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            disabled
-          />
+          {/* <Checkbox */}
+          {/*   indeterminate={numSelected > 0 && numSelected < rowCount} */}
+          {/*   checked={rowCount > 0 && numSelected === rowCount} */}
+          {/*   onChange={onSelectAllClick} */}
+          {/*   disabled */}
+          {/* /> */}
         </TableCell>
         {headLabel.map((headCell) => (
           <TableCell

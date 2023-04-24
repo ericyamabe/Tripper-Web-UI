@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet-async';
-import { filter, sample } from 'lodash';
+import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
 import { useEffect, useState } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
@@ -52,13 +52,16 @@ function descendingComparator(a, b, orderBy) {
   if (b[orderBy] > a[orderBy]) {
     return 1;
   }
-  return 0;
+  // if values are equal, return the opposite of ascending order result
+  return orderBy === 'status' ? -descendingComparator(a, b, 'name') : 0;
 }
 
 function getComparator(order, orderBy) {
   return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
+      ? (a, b) => descendingComparator(a, b, orderBy)
+      : orderBy === 'status'
+          ? (a, b) => descendingComparator(a, b, 'notes')
+          : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
 function applySortFilter(array, comparator, query) {
@@ -83,7 +86,6 @@ export default function TripsPage() {
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [error, setError] = useState(null);
   const [trips, setTrips] = useState([]);
   const [tempUuid, setTempUuid] = useState('');
   const [tempName, setTempName] = useState('');
@@ -92,6 +94,7 @@ export default function TripsPage() {
   const [tempOrigin, setTempOrigin] = useState('');
   const [tempDestination, setTempDestination] = useState('');
   const [tempStopLocations, setTempStopLocations] = useState([]);
+  const [tempStatus, setTempStatus] = useState('');
 
   const [
     origin,
@@ -116,9 +119,7 @@ export default function TripsPage() {
 
   useEffect(() => {
     fetchTrips().catch((err) => {
-      setError(true);
       console.log(err);
-      console.log(error);
     });
   }, []);
 
@@ -143,8 +144,7 @@ export default function TripsPage() {
     start_date: trips[index].start_date,
     end_date: trips[index].end_date,
     stop_locations: trips[index].stop_locations,
-    // stop_criteria: trips[index].stop_criteria,
-    status: sample(['complete', 'planned']), // lodash fake data
+    notes: trips[index].notes,
   }));
 
   const handleCloseMenu = () => {
@@ -162,7 +162,16 @@ export default function TripsPage() {
     setEndDate(tempEndDate);
     setOrigin(tempOrigin);
     setDestination(tempDestination);
-    navigate('edittrip', { replace: true });
+    setWaypts([]);
+    if (tempStopLocations.length > 0) {
+      setWaypts(tempStopLocations);
+    }
+    navigate('edittrip', {
+      replace: true,
+      state: {
+        passStatus: tempStatus,
+      },
+    });
   };
 
   const handleViewTrip = () => {
@@ -172,7 +181,7 @@ export default function TripsPage() {
     setEndDate(tempEndDate);
     setOrigin(tempOrigin);
     setDestination(tempDestination);
-    setWaypts([])
+    setWaypts([]);
     if (tempStopLocations.length > 0) {
       setWaypts(tempStopLocations);
     }
@@ -194,7 +203,7 @@ export default function TripsPage() {
     setSelected([]);
   };
 
-  const handleClick = (event, uuid, name, start, destination, start_date, end_date, stop_locations) => {
+  const handleClick = (event, uuid, name, start, destination, start_date, end_date, stop_locations, notes) => {
     const selectedIndex = selected.indexOf(name);
     let newSelected = [];
     if (selectedIndex === -1) {
@@ -218,6 +227,7 @@ export default function TripsPage() {
     setTempOrigin(start);
     setTempDestination(destination);
     setTempStopLocations(stop_locations);
+    setTempStatus(notes);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -250,11 +260,7 @@ export default function TripsPage() {
             Trips
           </Typography>
           {!isSelected ? (
-            <Button
-              variant="contained"
-              startIcon={<Iconify icon="eva:plus-fill" />}
-              onClick={handleAddTrip}
-            >
+            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleAddTrip}>
               Add Trip
             </Button>
           ) : (
@@ -294,7 +300,8 @@ export default function TripsPage() {
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                     // eslint-disable-next-line camelcase
-                    const { uuid, name, start_date, status, start, destination, avatarUrl, end_date, stop_locations } = row;
+                    const { uuid, name, start_date, notes, start, destination, avatarUrl, end_date, stop_locations } =
+                      row;
                     const selectedTrip = selected.indexOf(name) !== -1;
                     const disabled = selected.length > 0 && !selectedTrip; // Add this line
 
@@ -304,7 +311,7 @@ export default function TripsPage() {
                           <Checkbox
                             checked={selectedTrip}
                             onChange={(event) =>
-                              handleClick(event, uuid, name, start, destination, start_date, end_date, stop_locations)
+                              handleClick(event, uuid, name, start, destination, start_date, end_date, stop_locations, notes)
                             }
                             disabled={disabled}
                           />
@@ -322,12 +329,16 @@ export default function TripsPage() {
                         <TableCell align="left">{start}</TableCell>
                         <TableCell align="left">{destination}</TableCell>
                         {/* eslint-disable-next-line camelcase */}
-                        <TableCell align="left" style={{ minWidth: 115 }}>{start_date}</TableCell>
+                        <TableCell align="left" style={{ minWidth: 130 }}>
+                          {start_date}
+                        </TableCell>
                         {/* eslint-disable-next-line camelcase */}
-                        <TableCell align="left" style={{ minWidth: 115 }}>{end_date}</TableCell>
+                        <TableCell align="left" style={{ minWidth: 130 }}>
+                          {end_date}
+                        </TableCell>
 
                         <TableCell align="left">
-                          <Label color={(status === 'planned' && 'warning') || 'success'}>{sentenceCase(status)}</Label>
+                          <Label color={(notes === 'planned' && 'warning') || 'success'}>{sentenceCase(notes)}</Label>
                         </TableCell>
                       </TableRow>
                     );

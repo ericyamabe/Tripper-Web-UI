@@ -47,6 +47,7 @@ export default function DashboardLayout() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [user, setUser] = useState('Guest');
   const [email, setEmail] = useState('');
+  const [status, setStatus] = useState('');
   const [role, setRole] = useState('');
   const [toggleRefresh, setToggleRefresh] = useState(false);
 
@@ -102,6 +103,8 @@ export default function DashboardLayout() {
             setUser,
             toggleRefresh,
             setToggleRefresh,
+            status,
+            setStatus,
           ]}
         />
       </Main>

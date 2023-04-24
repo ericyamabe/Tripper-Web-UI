@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useLocation, useNavigate, useOutletContext } from 'react-router-dom';
 // @mui
-import { Box, Button, Card, Container, Grid, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, Card, Checkbox, Container, Grid, Stack, TextField, Typography } from '@mui/material';
 import axios from '../sections/auth/api/axios';
 import { TRIP_UPDATE_URL } from '../sections/auth/api/urls';
 import GetCookie from '../sections/auth/api/GetCookie';
@@ -11,12 +11,8 @@ import Iconify from '../components/iconify';
 
 export default function EditTripPage() {
   const [error, setError] = useState('');
-  // const [stop_locations, setStop_locations] = useState('');
-  // const [stop_criteria, setStop_criteria] = useState('');
-  // const [notes, setNotes] = useState('');
-  // const [emergency_contacts, setEmergency_contacts] = useState('');
-  // const [packing_list, setPacking_list] = useState('');
-  // const [misc, setMisc] = useState('');
+  const { state } = useLocation();
+  const { passStatus } = state;
   const [
     origin,
     setOrigin,
@@ -32,16 +28,22 @@ export default function EditTripPage() {
     setStartDate,
     endDate,
     setEndDate,
-    isLoaded,
-    setIsLoaded,
-    user,
-    setUser,
+    status,
+    setStatus,
   ] = useOutletContext();
+  const [stop_locations, setStop_locations] = useState(waypts.map((waypoint) => waypoint.location));
 
   const navigate = useNavigate();
 
   // used to get CSRFToken from current cookie for API calls to verify user.
   const csrfFromCookie = GetCookie('csrftoken');
+
+  useEffect(() => {
+    if (waypts.length > 0) {
+      setStop_locations(waypts.map((waypoint) => waypoint.location));
+    }
+    setStatus(passStatus);
+  }, [waypts]);
 
   const handleCancel = () => {
     setOrigin('');
@@ -51,8 +53,17 @@ export default function EditTripPage() {
     setName('');
     setStartDate('');
     setEndDate('');
-  navigate('/dashboard/trips', { replace: true })
-  }
+    setStatus('');
+    navigate('/dashboard/trips', { replace: true });
+  };
+
+  const handleCheckboxClick = (event) => {
+    if (event.target.checked) {
+      setStatus('complete');
+    } else {
+      setStatus('planned');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -65,12 +76,10 @@ export default function EditTripPage() {
     formData.append('destination', destination);
     formData.append('start_date', startDate);
     formData.append('end_date', endDate);
-    // formData.append('stop_locations', stop_locations);
-    // formData.append('stop_criteria', stop_criteria);
-    // formData.append('notes', notes);
-    // formData.append('emergency_contacts', emergency_contacts);
-    // formData.append('packing_list', packing_list);
-    // formData.append('misc', misc);
+    const stopLocationsArray = stop_locations.map((location) => ({ location }));
+    formData.append('stop_locations', JSON.stringify(stopLocationsArray));
+    formData.append('stop_criteria', '{}');
+    formData.append('notes', status);
 
     try {
       const response = await axios.post(TRIP_UPDATE_URL, formData, {
@@ -84,6 +93,8 @@ export default function EditTripPage() {
       if (!err?.response) {
         setError('No Server Response');
       } else if (err.response?.status === 501) {
+        setError('Wrong format.');
+      } else if (err.response?.status === 500) {
         setError('Wrong format.');
       }
     }
@@ -134,6 +145,55 @@ export default function EditTripPage() {
                         setDestination(event.target.value);
                       }}
                     />
+                    <Grid container alignItems="center" justifyContent="space-between">
+                      <Grid item xs={6}>
+                        <Box display="flex" sx={{ pl: 1 }} alignItems="center">
+                          <Typography>Add stops?</Typography>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Box display="flex" alignItems="center" sx={{ pr: 1 }} justifyContent="flex-end">
+                          <Button
+                            variant="contained"
+                            onClick={() => {
+                              if (stop_locations.length < 10) {
+                                const newLocations = [...stop_locations, ''];
+                                setStop_locations(newLocations);
+                              }
+                            }}
+                          >
+                            +
+                          </Button>
+                        </Box>
+                      </Grid>
+                    </Grid>
+                    {stop_locations.map((location, index) => (
+                      <Box key={index} display="flex" alignItems="center">
+                        <TextField
+                          value={location}
+                          label="Add Stop..."
+                          fullWidth
+                          required
+                          sx={{ pr: 2 }}
+                          onChange={(event) => {
+                            const newLocations = [...stop_locations];
+                            newLocations[index] = event.target.value;
+                            setStop_locations(newLocations);
+                          }}
+                        />
+                        <Button
+                          variant="outlined"
+                          sx={{ mr: 1 }}
+                          onClick={() => {
+                            const newLocations = [...stop_locations];
+                            newLocations.splice(index, 1);
+                            setStop_locations(newLocations);
+                          }}
+                        >
+                          Remove
+                        </Button>
+                      </Box>
+                    ))}
                     <TextField
                       id="start_date"
                       label="Start Date"
@@ -152,60 +212,10 @@ export default function EditTripPage() {
                         setEndDate(event.target.value);
                       }}
                     />
-                    {/* <TextField */}
-                    {/*   id="stop_locations" */}
-                    {/*   label="Stop Locations" */}
-                    {/*   disabled */}
-                    {/*   value={stop_locations} */}
-                    {/*   onChange={(event) => { */}
-                    {/*     setStop_locations(event.target.value); */}
-                    {/*   }} */}
-                    {/* /> */}
-                    {/* <TextField */}
-                    {/*   id="stop_criteria" */}
-                    {/*   label="Stop Criteria" */}
-                    {/*   disabled */}
-                    {/*   value={stop_criteria} */}
-                    {/*   onChange={(event) => { */}
-                    {/*     setStop_criteria(event.target.value); */}
-                    {/*   }} */}
-                    {/* /> */}
-                    {/* <TextField */}
-                    {/*   id="notes" */}
-                    {/*   label="Notes" */}
-                    {/*   disabled */}
-                    {/*   value={notes} */}
-                    {/*   onChange={(event) => { */}
-                    {/*     setNotes(event.target.value); */}
-                    {/*   }} */}
-                    {/* /> */}
-                    {/* <TextField */}
-                    {/*   id="emergency_contacts" */}
-                    {/*   label="Emergency Contacts" */}
-                    {/*   disabled */}
-                    {/*   value={emergency_contacts} */}
-                    {/*   onChange={(event) => { */}
-                    {/*     setEmergency_contacts(event.target.value); */}
-                    {/*   }} */}
-                    {/* /> */}
-                    {/* <TextField */}
-                    {/*   id="packing_list" */}
-                    {/*   label="Packing List" */}
-                    {/*   disabled */}
-                    {/*   value={packing_list} */}
-                    {/*   onChange={(event) => { */}
-                    {/*     setPacking_list(event.target.value); */}
-                    {/*   }} */}
-                    {/* /> */}
-                    {/* <TextField */}
-                    {/*   id="misc" */}
-                    {/*   label="Miscellaneous" */}
-                    {/*   disabled */}
-                    {/*   value={misc} */}
-                    {/*   onChange={(event) => { */}
-                    {/*     setMisc(event.target.value); */}
-                    {/*   }} */}
-                    {/* /> */}
+                    <div>
+                      <Checkbox checked={status === 'complete'} onClick={handleCheckboxClick} />
+                      Trip Completed?
+                    </div>
                     <div>{error && <small className="text-danger">{error}</small>}</div>
                     <Grid container item xs={12} justifyContent="center">
                       <Stack
@@ -214,7 +224,12 @@ export default function EditTripPage() {
                         direction={{ xs: 'column', sm: 'row' }}
                         spacing={{ xs: 1, sm: 2, md: 4 }}
                       >
-                        <Button variant="contained" type="submit" fullWidth startIcon={<Iconify icon="eva:checkmark-fill" />}>
+                        <Button
+                          variant="contained"
+                          type="submit"
+                          fullWidth
+                          startIcon={<Iconify icon="eva:checkmark-fill" />}
+                        >
                           Submit Edit
                         </Button>
                         <Button

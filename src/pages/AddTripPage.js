@@ -36,6 +36,7 @@ export default function AddTripPage() {
     const stopLocationsArray = stop_locations.map((location) => ({ location }));
     formData.append('stop_locations', JSON.stringify(stopLocationsArray));
     formData.append('stop_criteria', '{}');
+    formData.append('notes', 'planned');
 
     console.log('Form Data:');
     Array.from(formData.entries()).forEach(([key, value]) => {
@@ -54,6 +55,8 @@ export default function AddTripPage() {
       if (!err?.response) {
         setError('No Server Response');
       } else if (err.response?.status === 501) {
+        setError('Wrong format.');
+      } else if (err.response?.status === 500) {
         setError('Wrong format.');
       }
     }
@@ -181,7 +184,7 @@ export default function AddTripPage() {
                       >
                         <Button
                           variant="contained"
-                          size="large"
+                          // size="large"
                           type="submit"
                           fullWidth
                           startIcon={<Iconify icon="eva:plus-fill" />}
@@ -190,7 +193,7 @@ export default function AddTripPage() {
                         </Button>
                         <Button
                           variant="contained"
-                          size="large"
+                          // size="large"
                           fullWidth
                           startIcon={<Iconify icon="eva:close-fill" />}
                           onClick={() => navigate('/dashboard/trips', { replace: true })}
