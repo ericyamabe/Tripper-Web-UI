@@ -1,16 +1,18 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 // // @mui
 import { Grid, Container, Typography, Card, Stack } from '@mui/material';
 // sections
 import { LoadingButton } from '@mui/lab';
+import axios from "axios";
 import { AppGoogleMapsAPI } from '../sections/@dashboard/app';
 import { StopList } from '../sections/@dashboard/trip';
 
 // ----------------------------------------------------------------------
 
 export default function DashboardAppPage() {
+  const [firstName, setFirstName] = useState('');
   const [
     origin,
     setOrigin,
@@ -34,10 +36,37 @@ export default function DashboardAppPage() {
     setToggleRefresh,
   ] = useOutletContext();
 
-  const formattedStartDate = new Date(startDate).toLocaleDateString('en-US', {month: '2-digit', day: '2-digit', year: 'numeric'});
-  const formattedEndDate = new Date(endDate).toLocaleDateString('en-US', {month: '2-digit', day: '2-digit', year: 'numeric'});
+  const formattedStartDate = new Date(startDate).toLocaleDateString('en-US', {
+    month: '2-digit',
+    day: '2-digit',
+    year: 'numeric',
+  });
+  const formattedEndDate = new Date(endDate).toLocaleDateString('en-US', {
+    month: '2-digit',
+    day: '2-digit',
+    year: 'numeric',
+  });
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log(user);
+    axios
+      .get('http://localhost:8080/api/v1/accounts/profile/', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      })
+      .then((response) => {
+        const data = response.data;
+        if (data.first_name) setFirstName(data.first_name);
+        console.log(firstName);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
 
   return (
     <>
@@ -47,19 +76,19 @@ export default function DashboardAppPage() {
 
       <Container maxWidth="xl">
         {!isLoaded ? (
-          'Loading...'
-        ) : user ? (
-          <>
-            <Typography variant="h4" sx={{ mb: 5 }}>
-              Hi, {user} Welcome Back to Tripper
-            </Typography>
-          </>
+            'Loading...'
         ) : (
-          <>
-            <Typography variant="h4" sx={{ mb: 5 }}>
-              Welcome to Tripper
-            </Typography>
-          </>
+            <>
+              {user !== 'Guest' ? (
+                  <Typography variant="h4" sx={{ mb: 5 }}>
+                    Hi, {firstName !== '' ? firstName : user} Welcome Back to Tripper
+                  </Typography>
+              ) : (
+                  <Typography variant="h4" sx={{ mb: 5 }}>
+                    Welcome to Tripper
+                  </Typography>
+              )}
+            </>
         )}
 
         <Grid container spacing={3} justifyContent="center">

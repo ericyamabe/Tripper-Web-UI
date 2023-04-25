@@ -10,7 +10,7 @@ import GetCookie from '../sections/auth/api/GetCookie';
 
 export default function ProfilePage() {
   const [data, setData] = useState('');
-  const [showFields, setShowFields] = useState(false); // Add state variables
+  const [showFields, setShowFields] = useState(false);
   const [showPasswordFields, setShowPasswordFields] = useState(false);
   const [old_password, setOld_password] = useState('');
   const [password, setPassword] = useState('');
