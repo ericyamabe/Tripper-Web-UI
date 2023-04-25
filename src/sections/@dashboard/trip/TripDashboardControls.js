@@ -29,7 +29,7 @@ function InitializeTextfield({ value, onChange, onRemove }) {
   );
 }
 
-export default function StopList({
+export default function TripDashboardControls({
   uuid,
   setToggleRefresh,
   waypoints,

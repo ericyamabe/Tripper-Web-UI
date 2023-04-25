@@ -7,7 +7,7 @@ import { Grid, Container, Typography, Card, Stack } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import axios from 'axios';
 import { AppGoogleMapsAPI } from '../sections/@dashboard/app';
-import { StopList } from '../sections/@dashboard/trip';
+import { StopsList, TripDashboardControls } from '../sections/@dashboard/trip';
 
 // ----------------------------------------------------------------------
 
@@ -89,20 +89,24 @@ export default function DashboardAppPage() {
                 <Grid container item xs={12} justifyContent="center">
                   <Card sx={{ mt: 3, p: 3, width: 0.75 }}>
                     {origin !== '' ? (
-                      <StopList
-                        uuid={uuid}
-                        setToggleRefresh={setToggleRefresh}
-                        waypoints={waypts}
-                        setWaypts={setWaypts}
-                        origin={origin}
-                        setOrigin={setOrigin}
-                        destination={destination}
-                        setDestination={setDestination}
-                        name={name}
-                        setName={setName}
-                        startDate={startDate}
-                        endDate={endDate}
-                      />
+                      <>
+                        <TripDashboardControls
+                          uuid={uuid}
+                          setToggleRefresh={setToggleRefresh}
+                          waypoints={waypts}
+                          setWaypts={setWaypts}
+                          origin={origin}
+                          setOrigin={setOrigin}
+                          destination={destination}
+                          setDestination={setDestination}
+                          name={name}
+                          setName={setName}
+                          startDate={startDate}
+                          endDate={endDate}
+                        />
+                        <br/>
+                        <StopsList origin={origin} destination={destination} />
+                      </>
                     ) : (
                       <Stack
                         alignItems="center"
