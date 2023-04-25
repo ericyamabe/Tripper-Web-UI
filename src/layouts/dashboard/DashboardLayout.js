@@ -6,7 +6,7 @@ import { styled } from '@mui/material/styles';
 import axios from 'axios';
 import Header from './header';
 import Nav from './nav';
-import { WHOAMI_URL } from '../../sections/auth/api/urls';
+import { VIEW_PROFILE_URL, WHOAMI_URL } from '../../sections/auth/api/urls';
 
 // ----------------------------------------------------------------------
 
@@ -50,28 +50,47 @@ export default function DashboardLayout() {
   const [status, setStatus] = useState('');
   const [role, setRole] = useState('');
   const [toggleRefresh, setToggleRefresh] = useState(false);
+  const [firstName, setFirstName] = useState('');
+  const [tempFirst, setTempFirst] = useState('');
 
   useEffect(() => {
     axios
-      .get(WHOAMI_URL, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true,
-      })
-      .then((response) => {
-        const data = response.data;
-        if (data.username) setUser(data.username);
-        if (data.email) setEmail(data.email);
-        if (data.role === true) setRole('Admin');
-        if (data.role === false) setRole('Guest');
-        if (!data.role) setRole('');
-        setIsLoaded(true);
-      })
+      .all([
+        axios.get(WHOAMI_URL, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        }),
+        axios.get(VIEW_PROFILE_URL, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        }),
+      ])
+      .then(
+        axios.spread((whoamiResponse, profileResponse) => {
+          const whoamiData = whoamiResponse.data;
+          const profileData = profileResponse.data;
+
+          if (whoamiData.username) setUser(whoamiData.username);
+          if (whoamiData.email) setEmail(whoamiData.email);
+          if (whoamiData.role === true) setRole('Admin');
+          else if (whoamiData.role === false) setRole('User');
+          else if (!whoamiData.role) setRole('');
+
+          if (profileData.first_name) setFirstName(profileData.first_name);
+
+          setIsLoaded(true);
+        })
+      )
       .catch((error) => {
         setIsLoaded(true);
         setError(error);
       });
+
+    setTempFirst(firstName);
   }, []);
 
   return (
@@ -81,6 +100,7 @@ export default function DashboardLayout() {
       <Nav isLoaded={isLoaded} user={user} role={role} openNav={open} onCloseNav={() => setOpen(false)} />
 
       <Main>
+        {firstName}
         <Outlet
           context={[
             origin,
@@ -105,6 +125,8 @@ export default function DashboardLayout() {
             setToggleRefresh,
             status,
             setStatus,
+            tempFirst,
+            setTempFirst,
           ]}
         />
       </Main>

@@ -41,6 +41,7 @@ export default function Nav({ openNav, onCloseNav, isLoaded, user, role }) {
   useEffect(() => {
     if (openNav) {
       onCloseNav();
+      console.log(role)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
