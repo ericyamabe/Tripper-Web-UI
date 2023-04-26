@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Card, CardHeader, List, ListItem, ListItemText, Typography } from '@mui/material';
+import {Button, Card, CardHeader, List, ListItem, ListItemText, Typography} from '@mui/material';
 
 async function fetchStops(origin, destination) {
   const url = `http://localhost:8080/api/v1/trips/find_stops/?origin=${origin}&destination=${destination}`;
@@ -8,7 +8,7 @@ async function fetchStops(origin, destination) {
   return data;
 }
 
-export default function StopsList({ origin, destination }) {
+export default function StopsList({ origin, destination, fields, setFields, handleAddField}) {
   const [stops, setStops] = useState([]);
 
   useEffect(() => {
@@ -31,6 +31,7 @@ export default function StopsList({ origin, destination }) {
           {stops.map((stop, index) => (
             <ListItem key={index}>
               <ListItemText primary={stop.reason} secondary={`${stop.location.lat}, ${stop.location.lng}`} />
+              <Button variant="outlined" onClick={() => handleAddField(`${stop.location.lat}, ${stop.location.lng}`)}>Add</Button>
             </ListItem>
           ))}
         </List>

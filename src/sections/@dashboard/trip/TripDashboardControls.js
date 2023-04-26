@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Stack, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import Iconify from '../../../components/iconify';
 import axios from '../../auth/api/axios';
 import { TRIP_UPDATE_URL } from '../../auth/api/urls';
@@ -42,8 +42,11 @@ export default function TripDashboardControls({
   setName,
   startDate,
   endDate,
+  fields,
+  setFields,
+  handleAddField,
 }) {
-  const [fields, setFields] = useState([]);
+  // const [fields, setFields] = useState([]);
   const [tempOrigin, setTempOrigin] = useState('');
   const [tempDestination, setTempDestination] = useState('');
   const [error, setError] = useState('');
@@ -63,11 +66,11 @@ export default function TripDashboardControls({
     setTempDestination(destination);
   }, [origin, destination, waypoints]);
 
-  const handleAddField = () => {
-    if (fields.length < 10) {
-      setFields([...fields, '']);
-    }
-  };
+  // const handleAddField = () => {
+  //   if (fields.length < 10) {
+  //     setFields([...fields, '']);
+  //   }
+  // };
 
   const handleUpdate = (index, newValue) => {
     const newFields = [...fields];
@@ -87,12 +90,6 @@ export default function TripDashboardControls({
     const newFields = [...fields];
     newFields.splice(index, 1);
     setFields(newFields);
-
-    const newWaypoints = [...waypoints];
-    newWaypoints.splice(index, 1);
-    setWaypts(newWaypoints);
-
-    setToggleRefresh((prev) => !prev);
   };
 
   const handleSubmit = async (e) => {
@@ -100,10 +97,8 @@ export default function TripDashboardControls({
 
     const filteredFields = fields.filter((field) => field !== '');
     const formattedFields = filteredFields.map((field) => ({ location: field }));
-    if (tempOrigin !== '')
-      setOrigin(tempOrigin);
-    if (tempDestination !== '')
-      setDestination(tempDestination);
+    if (tempOrigin !== '') setOrigin(tempOrigin);
+    if (tempDestination !== '') setDestination(tempDestination);
     setWaypts(formattedFields);
     setFields([]);
 
@@ -137,7 +132,6 @@ export default function TripDashboardControls({
         setError('Wrong format.');
       }
     }
-    // navigate(0);
   };
 
   const handleRemoveWaypoints = () => {
@@ -196,7 +190,7 @@ export default function TripDashboardControls({
         </Stack>
         <Stack alignItems="center" direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1, sm: 2, md: 4 }}>
           <TextField
-            sx={{ m: 1 }}
+            sx={{ my: 1 }}
             name="origin"
             label="Choose origin..."
             id="origin"
@@ -206,7 +200,7 @@ export default function TripDashboardControls({
             onChange={handleOriginChange}
           />
           <TextField
-            sx={{ m: 1 }}
+            sx={{ my: 1 }}
             name="destination"
             label="Choose destination..."
             id="destination"
@@ -223,7 +217,7 @@ export default function TripDashboardControls({
           variant="contained"
           type="button"
           startIcon={<Iconify icon="eva:plus-fill" />}
-          onClick={handleAddField}
+          onClick={() => handleAddField('')}
         >
           {fields.length === 0 && 'Add a Stop'}
           {fields.length > 0 && fields.length !== 10 && <div>Add a Stop: ({fields.length} of 10)</div>}
@@ -238,21 +232,20 @@ export default function TripDashboardControls({
           />
         ))}
 
-          <>
-            <div>{error && <small className="text-danger">{error}</small>}</div>
-            <LoadingButton
-              sx={{ mt: 1, p: 1 }}
-              fullWidth
-              size="large"
-              variant="contained"
-              type="submit"
-              startIcon={<Iconify icon="eva:checkmark-fill" />}
-              onClick={handleSubmit}
-            >
-              Submit
-            </LoadingButton>
-          </>
-
+        <>
+          <div>{error && <small className="text-danger">{error}</small>}</div>
+          <LoadingButton
+            sx={{ mt: 1, p: 1 }}
+            fullWidth
+            size="large"
+            variant="contained"
+            type="submit"
+            startIcon={<Iconify icon="eva:checkmark-fill" />}
+            onClick={handleSubmit}
+          >
+            Submit
+          </LoadingButton>
+        </>
       </form>
     </>
   );
