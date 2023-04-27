@@ -100,7 +100,6 @@ export default function DashboardLayout() {
       <Nav isLoaded={isLoaded} user={user} role={role} openNav={open} onCloseNav={() => setOpen(false)} />
 
       <Main>
-        {firstName}
         <Outlet
           context={[
             origin,
