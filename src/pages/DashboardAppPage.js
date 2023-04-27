@@ -5,15 +5,12 @@ import { Helmet } from 'react-helmet-async';
 import { Grid, Container, Typography, Card, Stack } from '@mui/material';
 // sections
 import { LoadingButton } from '@mui/lab';
-import axios from 'axios';
 import { AppGoogleMapsAPI } from '../sections/@dashboard/app';
-import { StopsList, TripDashboardControls } from '../sections/@dashboard/trip';
+import { TripDashboardControls } from '../sections/@dashboard/trip';
 
 // ----------------------------------------------------------------------
 
 export default function DashboardAppPage() {
-  // const [firstName, setFirstName] = useState('');
-  const [fields, setFields] = useState([]);
   const [
     origin,
     setOrigin,
@@ -51,12 +48,6 @@ export default function DashboardAppPage() {
   });
 
   const navigate = useNavigate();
-
-  const handleAddField = (value) => {
-    if (fields.length < 10) {
-      setFields([...fields, value]);
-    }
-  };
 
   return (
     <>
@@ -110,12 +101,7 @@ export default function DashboardAppPage() {
                           setName={setName}
                           startDate={startDate}
                           endDate={endDate}
-                          fields={fields}
-                          setFields={setFields}
-                          handleAddField={handleAddField}
                         />
-                        <br/>
-                        <StopsList origin={origin} destination={destination} fields={fields} setFields={setFields} handleAddField={handleAddField} />
                       </>
                     ) : (
                       <Stack

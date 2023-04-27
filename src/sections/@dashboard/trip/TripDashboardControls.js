@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, Stack, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useNavigate } from 'react-router-dom';
 import Iconify from '../../../components/iconify';
 import axios from '../../auth/api/axios';
 import { TRIP_UPDATE_URL } from '../../auth/api/urls';
 import GetCookie from '../../auth/api/GetCookie';
+import { StopsList } from './index';
 
 function InitializeTextfield({ value, onChange, onRemove }) {
   return (
@@ -42,11 +43,8 @@ export default function TripDashboardControls({
   setName,
   startDate,
   endDate,
-  fields,
-  setFields,
-  handleAddField,
 }) {
-  // const [fields, setFields] = useState([]);
+  const [fields, setFields] = useState([]);
   const [tempOrigin, setTempOrigin] = useState('');
   const [tempDestination, setTempDestination] = useState('');
   const [error, setError] = useState('');
@@ -66,11 +64,11 @@ export default function TripDashboardControls({
     setTempDestination(destination);
   }, [origin, destination, waypoints]);
 
-  // const handleAddField = () => {
-  //   if (fields.length < 10) {
-  //     setFields([...fields, '']);
-  //   }
-  // };
+  const handleAddField = (value) => {
+    if (fields.length < 10) {
+      setFields([...fields, value]);
+    }
+  };
 
   const handleUpdate = (index, newValue) => {
     const newFields = [...fields];
@@ -247,6 +245,9 @@ export default function TripDashboardControls({
           </LoadingButton>
         </>
       </form>
+      <Box sx={{ mt: 3, boxShadow: 3 }}>
+        <StopsList origin={origin} destination={destination} handleAddField={handleAddField} />
+      </Box>
     </>
   );
 }
