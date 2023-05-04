@@ -1,23 +1,29 @@
 import { useEffect, useState } from 'react';
 import { Button, Card, CardHeader, List, ListItem, ListItemText, Typography } from '@mui/material';
 
-async function fetchStops(origin, destination) {
-  const url = `http://localhost:8080/api/v1/trips/find_stops/?origin=${origin}&destination=${destination}`;
+async function fetchStops(origin, destination, waypoints, mileageText) {
+  let url = `http://localhost:8080/api/v1/trips/find_stops/?origin=${origin}&destination=${destination}`;
+  if (waypoints && waypoints.length > 0) {
+    url += `&waypoints=${JSON.stringify(waypoints)}`;
+  }
+  url += `&mileage=${mileageText}`;
+  // console.log(url);
   const response = await fetch(url);
   const data = await response.json();
   return data;
 }
 
-export default function StopsList({ origin, destination, handleAddField }) {
+export default function StopsList({ origin, destination, waypoints, mileageText, handleAddField }) {
   const [stops, setStops] = useState([]);
 
   useEffect(() => {
     async function getStops() {
-      const data = await fetchStops(origin, destination);
+      // console.log(waypoints); // log the waypoints array
+      const data = await fetchStops(origin, destination, waypoints, mileageText);
       setStops(data);
     }
     getStops();
-  }, [origin, destination]);
+  }, [origin, destination, waypoints]);
 
   return (
     <Card style={{ backgroundColor: '#f5f5f5', color: '#333', height: '400px', overflowY: 'scroll' }}>

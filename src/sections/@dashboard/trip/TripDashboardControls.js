@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, Slider, Stack, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useNavigate } from 'react-router-dom';
 import Iconify from '../../../components/iconify';
@@ -7,6 +7,81 @@ import axios from '../../auth/api/axios';
 import { TRIP_UPDATE_URL } from '../../auth/api/urls';
 import GetCookie from '../../auth/api/GetCookie';
 import { StopsList } from './index';
+
+function MileageSlider({ setMileageText }) {
+  const [mileage, setMileage] = useState(250);
+  const marks = [
+    {
+      value: 50,
+      label: '50 mi',
+    },
+    {
+      value: 100,
+      label: '100 mi',
+    },
+    {
+      value: 150,
+      label: '150 mi',
+    },
+    {
+      value: 200,
+      label: '200 mi',
+    },
+    {
+      value: 250,
+      label: '250 mi',
+    },
+    {
+      value: 300,
+      label: '300 mi',
+    },
+    {
+      value: 350,
+      label: '350 mi',
+    },
+    {
+      value: 400,
+      label: '400 mi',
+    },
+    {
+      value: 450,
+      label: '450 mi',
+    },
+    {
+      value: 500,
+      label: '500 mi',
+    },
+  ];
+
+  const valuetext = (value) => {
+    const text = `${value}`;
+    setMileageText(text); // update valueText state
+    return text;
+  };
+
+  const handleChange = (event, newValue) => {
+    setMileage(newValue);
+  };
+
+  return (
+    <Box maxWidth sx={{ mx: 5, py: 2, textAlign: 'center' }}>
+      <Typography variant="h5" sx={{ mb: 5 }}>
+        Distance Between Recommended Stops
+      </Typography>
+      <Slider
+        aria-label="Distance between recommended stops"
+        value={mileage}
+        onChange={handleChange}
+        getAriaValueText={valuetext}
+        valueLabelDisplay="auto"
+        step={50}
+        marks={marks}
+        min={50}
+        max={500}
+      />
+    </Box>
+  );
+}
 
 function InitializeTextfield({ value, onChange, onRemove }) {
   return (
@@ -48,6 +123,7 @@ export default function TripDashboardControls({
   const [tempOrigin, setTempOrigin] = useState('');
   const [tempDestination, setTempDestination] = useState('');
   const [error, setError] = useState('');
+  const [mileageText, setMileageText] = useState('250'); // mileageText state
 
   // used to get CSRFToken from current cookie for API calls to verify user.
   const csrfFromCookie = GetCookie('csrftoken');
@@ -230,6 +306,7 @@ export default function TripDashboardControls({
           />
         ))}
 
+        <MileageSlider setMileageText={setMileageText} />
         <>
           <div>{error && <small className="text-danger">{error}</small>}</div>
           <LoadingButton
@@ -246,7 +323,13 @@ export default function TripDashboardControls({
         </>
       </form>
       <Box sx={{ mt: 3, boxShadow: 3 }}>
-        <StopsList origin={origin} destination={destination} handleAddField={handleAddField} />
+        <StopsList
+          origin={origin}
+          destination={destination}
+          waypoints={waypoints}
+          mileageText={mileageText}
+          handleAddField={handleAddField}
+        />
       </Box>
     </>
   );
