@@ -32,8 +32,6 @@ export default function DashboardAppPage() {
     setUser,
     toggleRefresh,
     setToggleRefresh,
-    tempFirst,
-    setTempFirst,
   ] = useOutletContext();
 
   const formattedStartDate = new Date(startDate).toLocaleDateString('en-US', {
@@ -62,7 +60,7 @@ export default function DashboardAppPage() {
           <>
             {user !== 'Guest' ? (
               <Typography variant="h4" sx={{ mb: 5 }}>
-                Hi, {tempFirst !== '' ? tempFirst : user} Welcome Back to Tripper
+                Hi, {user} Welcome Back to Tripper
               </Typography>
             ) : (
               <Typography variant="h4" sx={{ mb: 5 }}>
