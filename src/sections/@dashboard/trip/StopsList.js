@@ -21,6 +21,7 @@ export default function StopsList({ origin, destination, waypoints, mileageText,
       // console.log(waypoints); // log the waypoints array
       const data = await fetchStops(origin, destination, waypoints, mileageText);
       setStops(data);
+      console.log(stops);
     }
     getStops();
   }, [origin, destination, waypoints]);
@@ -36,7 +37,7 @@ export default function StopsList({ origin, destination, waypoints, mileageText,
         <List>
           {stops.map((stop, index) => (
             <ListItem key={index}>
-              <ListItemText primary={stop.reason} secondary={`${stop.location.lat}, ${stop.location.lng}`} />
+              <ListItemText primary={`${stop.type}: ${stop.reasons}`} secondary={`${stop.location.lat}, ${stop.location.lng}`} />
               <Button variant="outlined" onClick={() => handleAddField(`${stop.location.lat}, ${stop.location.lng}`)}>
                 Add
               </Button>
