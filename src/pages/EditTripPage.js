@@ -103,6 +103,14 @@ export default function EditTripPage() {
         withCredentials: true,
       });
       console.log(JSON.stringify(response?.data));
+      setOrigin('');
+      setDestination('');
+      setWaypts([]);
+      setUuid('');
+      setName('');
+      setStartDate('');
+      setEndDate('');
+      setStatus('');
       navigate('/dashboard/trips', { replace: true });
     } catch (err) {
       console.log(err);
