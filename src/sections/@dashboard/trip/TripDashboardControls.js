@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button, Slider, Stack, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { useNavigate } from 'react-router-dom';
 import Iconify from '../../../components/iconify';
 import axios from '../../auth/api/axios';
 import { TRIP_UPDATE_URL } from '../../auth/api/urls';
@@ -66,7 +65,7 @@ function MileageSlider({ setMileageText }) {
   return (
     <Box maxWidth sx={{ mx: 5, py: 2, textAlign: 'center' }}>
       <Typography variant="h5" sx={{ mb: 5 }}>
-        Distance Between Recommended Stops
+        Distance Between Stops
       </Typography>
       <Slider
         aria-label="Distance between recommended stops"
@@ -124,11 +123,10 @@ export default function TripDashboardControls({
   const [tempDestination, setTempDestination] = useState('');
   const [error, setError] = useState('');
   const [mileageText, setMileageText] = useState('250'); // mileageText state
+  const [isLoaded, setIsLoaded] = useState(false);
 
   // used to get CSRFToken from current cookie for API calls to verify user.
   const csrfFromCookie = GetCookie('csrftoken');
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (waypoints.length > 0) {
@@ -168,6 +166,8 @@ export default function TripDashboardControls({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    setIsLoaded(false);
 
     const filteredFields = fields.filter((field) => field !== '');
     const formattedFields = filteredFields.map((field) => ({ location: field }));
@@ -329,6 +329,8 @@ export default function TripDashboardControls({
           waypoints={waypoints}
           mileageText={mileageText}
           handleAddField={handleAddField}
+          isLoaded={isLoaded}
+          setIsLoaded={setIsLoaded}
         />
       </Box>
     </>
