@@ -95,7 +95,7 @@ export default function RegisterForm() {
       })
       .catch((err) => {
         console.log(err);
-        setError(err.error);
+        setError("Something went wrong.  Check information and try again.");
         if (password !== password_confirm) setError('Make sure passwords match.');
         if (password_confirm === '') setError('Enter a valid password.');
         if (password === '') setError('Enter a valid password.');

@@ -50,8 +50,6 @@ export default function DashboardLayout() {
   const [status, setStatus] = useState('');
   const [role, setRole] = useState('');
   const [toggleRefresh, setToggleRefresh] = useState(false);
-  const [firstName, setFirstName] = useState('');
-  const [tempFirst, setTempFirst] = useState('');
 
   useEffect(() => {
     axios
@@ -80,8 +78,6 @@ export default function DashboardLayout() {
           else if (whoamiData.role === false) setRole('User');
           else if (!whoamiData.role) setRole('');
 
-          if (profileData.first_name) setFirstName(profileData.first_name);
-
           setIsLoaded(true);
         })
       )
@@ -89,8 +85,6 @@ export default function DashboardLayout() {
         setIsLoaded(true);
         setError(error);
       });
-
-    setTempFirst(firstName);
   }, []);
 
   return (
@@ -124,8 +118,6 @@ export default function DashboardLayout() {
             setToggleRefresh,
             status,
             setStatus,
-            tempFirst,
-            setTempFirst,
           ]}
         />
       </Main>

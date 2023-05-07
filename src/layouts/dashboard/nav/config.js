@@ -42,11 +42,11 @@ export const navConfig2 = [
 ];
 
 export const navConfig3 = [
-  {
-    title: 'User Management',
-    path: '/dashboard/user',
-    icon: icon('ic_disabled'),
-  },
+  // {
+  //   title: 'User Management',
+  //   path: '/dashboard/user',
+  //   icon: icon('ic_disabled'),
+  // },
 ];
 
 export const navConfig4 = [
