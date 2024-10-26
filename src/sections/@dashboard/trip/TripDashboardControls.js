@@ -129,7 +129,7 @@ export default function TripDashboardControls({
   const csrfFromCookie = GetCookie('csrftoken');
 
   useEffect(() => {
-    if (waypoints.length > 0) {
+    if (Array.isArray(waypoints) && waypoints.length > 0) {
       const initialFields = waypoints.map((waypoint) => waypoint.location);
       setFields(initialFields);
     }

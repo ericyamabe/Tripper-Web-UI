@@ -34,7 +34,7 @@ export default function EditTripPage() {
     status,
     setStatus,
   ] = useOutletContext();
-  const [stop_locations, setStop_locations] = useState(waypts.map((waypoint) => waypoint.location));
+  const [stop_locations, setStop_locations] = useState(Array.isArray(waypts) ? waypts.map((waypoint) => waypoint.location) : []);
 
   const navigate = useNavigate();
 
@@ -42,7 +42,7 @@ export default function EditTripPage() {
   const csrfFromCookie = GetCookie('csrftoken');
 
   useEffect(() => {
-    if (waypts.length > 0) {
+    if (Array.isArray(waypts) && waypts.length > 0) {
       setStop_locations(waypts.map((waypoint) => waypoint.location));
     }
     setStatus(passStatus);
